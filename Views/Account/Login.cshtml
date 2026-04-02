@@ -1,0 +1,54 @@
+﻿@model DonorTrackingSystem.ViewModels.AccountLoginViewModel
+@{
+    ViewData["Title"] = "Login | Donor Tracking System";
+}
+
+<!-- Page-specific CSS -->
+<link rel="stylesheet" href="~/css/login.css" />
+
+<div class="login-card">
+
+    <!-- Header -->
+    <div class="login-header">
+        <img src="~/Donor_Logo.png" alt="Donor Tracking System Logo" />
+        <h2>Donor Tracking System Portal</h2>
+    </div>
+
+    <!-- Form -->
+    <form asp-action="Login" method="post" class="needs-validation" novalidate>
+        @Html.AntiForgeryToken()
+
+        <!-- Validation Summary -->
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Login ID -->
+        <div class="mb-3">
+            <label asp-for="ID" class="form-label">Login ID</label>
+            <input asp-for="ID" type="text" inputmode="numeric" class="form-control" placeholder="Enter your ID" />
+            <span asp-validation-for="ID" class="text-danger"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary text-white" id="loginButton">
+                Sign In
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center login-footer">
+            Don't have an account?
+            <a asp-controller="Account" asp-action="Register" class="text-decoration-none">
+                Register
+            </a>
+        </div>
+
+    </form>
+</div>

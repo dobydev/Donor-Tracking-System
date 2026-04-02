@@ -1,0 +1,67 @@
+﻿/* Page background */
+body {
+    background: #f4f6f9;
+}
+
+/* Login Card */
+.login-card {
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 2rem;
+    border-radius: 1.25rem;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.login-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+    .login-header img {
+        width: 220px;
+        margin-bottom: 0.75rem;
+    }
+
+    .login-header h2 {
+        font-weight: 600;
+        font-size: 1.4rem;
+        color: #17345f;
+    }
+
+/* Inputs */
+.form-control {
+    border-radius: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #dcdcdc;
+}
+
+    .form-control:focus {
+        border-color: #224c86;
+        box-shadow: 0 0 0 0.15rem rgba(34, 76, 134, 0.15);
+    }
+
+/* Button */
+.btn-primary {
+    border-radius: 0.6rem;
+    padding: 0.7rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, #17345f, #224c86);
+    border: none;
+}
+
+    .btn-primary:hover {
+        opacity: 0.95;
+    }
+
+/* Footer */
+.login-footer {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+    .login-footer a {
+        color: #224c86;
+        font-weight: 500;
+    }
