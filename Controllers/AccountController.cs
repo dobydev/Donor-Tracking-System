@@ -48,7 +48,7 @@ namespace DonorTrackingSystem.Controllers
             if (ModelState.IsValid)
             {
                 // Identity: attempt password sign-in using ID as username
-                var result = await signInManager.PasswordSignInAsync(vm.ID.ToString(), vm.Password, false, false);
+                var result = await signInManager.PasswordSignInAsync(vm.ID.ToString(), vm.Password.ToString(), false, false);
 
                 // If sign-in is successful, redirect to the appropriate page based on user role
                 if (result.Succeeded)
@@ -60,17 +60,17 @@ namespace DonorTrackingSystem.Controllers
                         var roles = await userManager.GetRolesAsync(user);
 
                         // Redirect based on user role
-                        if (roles.Contains("Admin"))
+                        if (roles.Contains("Administrator"))
                         {
-                            return RedirectToAction("Index", "Admin");
+                            return RedirectToAction("Index", "Administrator");
                         }
-                        else if (roles.Contains("Donor"))
+                        else if (roles.Contains("Officer Manager"))
                         {
-                            return RedirectToAction("Index", "Donor");
+                            return RedirectToAction("Index", "Office Manager");
                         }
-                        else if (roles.Contains("Staff"))
+                        else if (roles.Contains("Support Staff"))
                         {
-                            return RedirectToAction("Index", "Staff");
+                            return RedirectToAction("Index", "Support Staff");
                         }
                         else
                         {

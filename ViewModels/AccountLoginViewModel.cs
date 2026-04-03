@@ -8,6 +8,6 @@ namespace DonorTrackingSystem.ViewModels
         public int ID { get; set; }
 
         [Required, DataType(DataType.Password)]
-        public required string Password { get; set; }
+        public required int Password { get; set; }
     }
 }

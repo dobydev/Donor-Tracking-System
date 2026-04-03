@@ -18,7 +18,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(connection));
 
 // Identity configuration
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Configure password requirements for 6-digit numeric passwords
+    // Had to do this because Identity's default password requirements are too strict for our use case
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+})
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
@@ -33,6 +42,15 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+
+// Seed users and roles
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    await DonorTrackingSystem.Data.DataUtility.SeedUsersAsync(userManager, roleManager);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
