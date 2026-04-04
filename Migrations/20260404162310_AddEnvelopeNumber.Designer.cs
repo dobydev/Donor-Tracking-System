@@ -4,6 +4,7 @@ using DonorTrackingSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DonorTrackingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260404162310_AddEnvelopeNumber")]
+    partial class AddEnvelopeNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,9 +117,6 @@ namespace DonorTrackingSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int?>("CongregantID")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("DonationAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -132,19 +132,12 @@ namespace DonorTrackingSystem.Migrations
                     b.Property<int>("FundDesignationID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NonMemberID")
-                        .HasColumnType("int");
-
                     b.Property<int>("StaffMemberID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CongregantID");
-
                     b.HasIndex("FundDesignationID");
-
-                    b.HasIndex("NonMemberID");
 
                     b.ToTable("Donations");
                 });
@@ -355,25 +348,13 @@ namespace DonorTrackingSystem.Migrations
 
             modelBuilder.Entity("DonorTrackingSystem.Models.Donation", b =>
                 {
-                    b.HasOne("DonorTrackingSystem.Models.Congregant", "Congregant")
-                        .WithMany()
-                        .HasForeignKey("CongregantID");
-
                     b.HasOne("DonorTrackingSystem.Models.FundDesignation", "FundDesignation")
                         .WithMany()
                         .HasForeignKey("FundDesignationID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DonorTrackingSystem.Models.NonMember", "NonMember")
-                        .WithMany()
-                        .HasForeignKey("NonMemberID");
-
-                    b.Navigation("Congregant");
-
                     b.Navigation("FundDesignation");
-
-                    b.Navigation("NonMember");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

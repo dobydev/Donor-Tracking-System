@@ -8,6 +8,13 @@ namespace DonorTrackingSystem.Models
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
 
+        // DbSets for donation tracking
+        public DbSet<Donation> Donations { get; set; }
+        public DbSet<FundDesignation> FundDesignations { get; set; }
+        public DbSet<Congregant> Congregants { get; set; }
+        public DbSet<NonMember> NonMembers { get; set; }
+        public DbSet<Committee> Committees { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -26,6 +33,14 @@ namespace DonorTrackingSystem.Models
                 entity.Ignore(u => u.LockoutEnabled);
                 entity.Ignore(u => u.AccessFailedCount);
             });
+
+            // Seed some default fund designations
+            builder.Entity<FundDesignation>().HasData(
+                new FundDesignation { ID = 1, Name = "General Fund", ActiveStatus = true },
+                new FundDesignation { ID = 2, Name = "Building Fund", ActiveStatus = true },
+                new FundDesignation { ID = 3, Name = "Missions", ActiveStatus = true },
+                new FundDesignation { ID = 4, Name = "Benevolence", ActiveStatus = true }
+            );
         }
     }
 }

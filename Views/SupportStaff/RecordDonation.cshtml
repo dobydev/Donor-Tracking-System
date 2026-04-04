@@ -1,0 +1,124 @@
+@model DonorTrackingSystem.Models.Donation
+@{
+    ViewData["Title"] = "Record Donation";
+}
+
+<!-- Custom CSS to hide number input spinner arrows -->
+<style>
+    /* Remove spinner arrows from number inputs for cleaner look */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox version */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<!-- Main container for donation form -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Center the form on larger screens -->
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Record New Donation</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Form submits to RecordDonation action -->
+                    <form asp-action="RecordDonation" method="post">
+                        <!-- Security token to prevent cross-site request forgery -->
+                        @Html.AntiForgeryToken()
+
+                        <!-- Display any validation errors -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Info message about auto-assigned Donor ID -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> Donor ID will be automatically assigned by the system.
+                        </div>
+
+                        <!-- Envelope Number -->
+                        <div class="mb-3">
+                            <label asp-for="EnvelopeNumber" class="form-label"></label>
+                            <input asp-for="EnvelopeNumber" class="form-control" type="text" placeholder="ENV-2026-001" />
+                            <span asp-validation-for="EnvelopeNumber" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional - for envelope donations only</small>
+                        </div>
+
+                        <!-- Donor Type Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Donor Type (Optional)</label>
+                            <p class="text-muted small">Select donor type or leave blank for anonymous donation</p>
+                        </div>
+
+                        <!-- Congregant dropdown (optional) -->
+                        <div class="mb-3">
+                            <label asp-for="CongregantID" class="form-label">Congregant</label>
+                            <!-- Dropdown list of congregants -->
+                            <select asp-for="CongregantID" class="form-select" asp-items="ViewBag.Congregants">
+                                <option value="">-- Select Congregant (Optional) --</option>
+                            </select>
+                            <span asp-validation-for="CongregantID" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional - select if from church member</small>
+                        </div>
+
+                        <!-- Non-Member Donor dropdown (optional) -->
+                        <div class="mb-3">
+                            <label asp-for="NonMemberID" class="form-label">Non-Member Donor</label>
+                            <!-- Dropdown list of non-member donors -->
+                            <select asp-for="NonMemberID" class="form-select" asp-items="ViewBag.NonMembers">
+                                <option value="">-- Select Non-Member (Optional) --</option>
+                            </select>
+                            <span asp-validation-for="NonMemberID" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional - select if from non-member, or <a asp-action="AddNonMember" target="_blank">add new non-member</a></small>
+                        </div>
+
+                        <!-- Donation Amount -->
+                        <div class="mb-3">
+                            <label asp-for="DonationAmount" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="DonationAmount" class="form-control" type="number" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="DonationAmount" class="text-danger"></span>
+                        </div>
+
+                        <!-- Donation Date -->
+                        <div class="mb-3">
+                            <label asp-for="DonationDate" class="form-label"></label>
+                            <input asp-for="DonationDate" class="form-control" type="date" />
+                            <span asp-validation-for="DonationDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Fund Designation dropdown (populated from database) -->
+                        <div class="mb-3">
+                            <label asp-for="FundDesignationID" class="form-label">Fund Designation</label>
+                            <!-- Dropdown list populated from ViewBag -->
+                            <select asp-for="FundDesignationID" class="form-select" asp-items="ViewBag.FundDesignations">
+                                <option value="">-- Select Fund --</option>
+                            </select>
+                            <span asp-validation-for="FundDesignationID" class="text-danger"></span>
+                        </div>
+
+                        <!-- Form action buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <!-- Cancel button returns to dashboard -->
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                            <!-- Submit button saves the donation -->
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save Donation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

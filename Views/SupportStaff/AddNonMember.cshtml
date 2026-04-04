@@ -1,0 +1,76 @@
+@model DonorTrackingSystem.Models.NonMember
+@{
+    ViewData["Title"] = "Add Non-Member Donor";
+}
+
+<!-- Main container for non-member donor form -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Center the form on larger screens -->
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-light text-black text-center">
+                    <h3>Add Non-Member Donor</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Form submits to AddNonMember action -->
+                    <form asp-action="AddNonMember" method="post">
+                        <!-- Security token to prevent cross-site request forgery -->
+                        @Html.AntiForgeryToken()
+                        
+                        <!-- Display any validation errors -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Requirement info message -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> Please provide either a name (First/Last) or a Company/Organization name.
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="mb-3">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" type="text" placeholder="Enter first name (optional if company provided)" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="mb-3">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" type="text" placeholder="Enter last name (optional if company provided)" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Company/Organization -->
+                        <div class="mb-3">
+                            <label asp-for="CompanyOrganization" class="form-label"></label>
+                            <input asp-for="CompanyOrganization" class="form-control" type="text" placeholder="Enter company or organization name (optional if name provided)" />
+                            <span asp-validation-for="CompanyOrganization" class="text-danger"></span>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="mb-3">
+                            <label asp-for="ContactDetails" class="form-label"></label>
+                            <textarea asp-for="ContactDetails" class="form-control" rows="3" placeholder="Enter contact information (phone, email, address - optional)"></textarea>
+                            <span asp-validation-for="ContactDetails" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional - phone, email, address, etc.</small>
+                        </div>
+
+                        <!-- Form action buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <!-- Cancel button returns to view non-members list -->
+                            <a asp-action="ViewNonMembers" class="btn btn-secondary">Cancel</a>
+                            <!-- Submit button saves the non-member donor -->
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save Non-Member Donor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

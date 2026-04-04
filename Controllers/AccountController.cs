@@ -66,11 +66,11 @@ namespace DonorTrackingSystem.Controllers
                         }
                         else if (roles.Contains("Officer Manager"))
                         {
-                            return RedirectToAction("Index", "Office Manager");
+                            return RedirectToAction("Index", "OfficeManager");
                         }
                         else if (roles.Contains("Support Staff"))
                         {
-                            return RedirectToAction("Index", "Support Staff");
+                            return RedirectToAction("Index", "SupportStaff");
                         }
                         else
                         {
@@ -85,7 +85,14 @@ namespace DonorTrackingSystem.Controllers
             return View(vm);
         }
 
-
+        /// <summary>
+        /// Logs out the current user and redirects to login.
+        /// </summary>
+        public async Task<IActionResult> Logout()
+        {
+            await signInManager.SignOutAsync();
+            return RedirectToAction("Login");
+        }
 
         public IActionResult Index()
         {

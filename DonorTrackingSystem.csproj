@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Admin\" />
-    <Folder Include="Views\Support Staff\" />
     <Folder Include="Views\Office Manager\" />
   </ItemGroup>
 
