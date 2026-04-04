@@ -1,0 +1,66 @@
+@model DonorTrackingSystem.Models.Congregant
+@{
+    ViewData["Title"] = "Add Congregant";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-light text-black text-center">
+                    <h3>Add Congregant (Church Member)</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddCongregant" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> Add a church member to the system for donation tracking.
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" type="text" placeholder="Enter full name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="mb-3">
+                            <label asp-for="EmailAddress" class="form-label">Email Address (Optional)</label>
+                            <input asp-for="EmailAddress" class="form-control" type="email" placeholder="Enter email address" />
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number (Optional)</label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="Enter phone number" />
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-3">
+                            <label asp-for="ActiveStatus" class="form-label"></label>
+                            <select asp-for="ActiveStatus" class="form-select" asp-items="Html.GetEnumSelectList<DonorTrackingSystem.Models.ActiveStatus>()">
+                            </select>
+                            <span asp-validation-for="ActiveStatus" class="text-danger"></span>
+                        </div>
+
+                        <!-- Form action buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="ViewCongregants" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save Congregant
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

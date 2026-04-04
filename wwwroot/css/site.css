@@ -1,4 +1,5 @@
-/* Modern, Clean Design for Donor Tracking System */
+/* I was aiming for a Modern, Clean Design for Donor Tracking System, something I used in a real internal tool
+for my current employer */
 
 html {
   font-size: 14px;
@@ -18,7 +19,7 @@ body {
   color: #2c3e50;
 }
 
-/* Clean card design - minimal and modern */
+/* Clean card design */
 .card {
   border: none;
   border-radius: 8px;
@@ -193,18 +194,36 @@ footer {
   text-align: center;
   padding: 1.5rem;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0;
 }
 
 .dashboard-card h5 {
   font-size: 1rem;
   margin-bottom: 0.75rem;
   color: #2c3e50;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dashboard-card p {
   font-size: 0.875rem;
   color: #7f8c8d;
   margin-bottom: 1.25rem;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
 }
 
 /* Input group styling */

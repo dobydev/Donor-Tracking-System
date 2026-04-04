@@ -50,8 +50,7 @@
 
                         <!-- Donor Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Donor Type (Optional)</label>
-                            <p class="text-muted small">Select donor type or leave blank for anonymous donation</p>
+                            <label class="form-label">Donor Type</label>
                         </div>
 
                         <!-- Congregant dropdown (optional) -->
@@ -62,7 +61,7 @@
                                 <option value="">-- Select Congregant (Optional) --</option>
                             </select>
                             <span asp-validation-for="CongregantID" class="text-danger"></span>
-                            <small class="form-text text-muted">Optional - select if from church member</small>
+                            <small class="form-text text-muted">Optional - select if from church member, or <a asp-action="AddCongregant" target="_blank">add new congregant</a></small>
                         </div>
 
                         <!-- Non-Member Donor dropdown (optional) -->
@@ -104,7 +103,7 @@
                         </div>
 
                         <!-- Form action buttons -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <div class="d-flex justify-content-between">
                             <!-- Cancel button returns to dashboard -->
                             <a asp-action="Index" class="btn btn-secondary">Cancel</a>
                             <!-- Submit button saves the donation -->

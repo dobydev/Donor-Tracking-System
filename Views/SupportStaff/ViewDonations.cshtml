@@ -14,17 +14,15 @@
     </div>
 
     <!-- Navigation buttons -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <!-- Button to record a new donation -->
-            <a asp-action="RecordDonation" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Record New Donation
-            </a>
-            <!-- Button to return to dashboard -->
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-house"></i> Back to Dashboard
-            </a>
-        </div>
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Button to record a new donation -->
+        <a asp-action="RecordDonation" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Record New Donation
+        </a>
+        <!-- Button to return to dashboard -->
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-house"></i> Back to Dashboard
+        </a>
     </div>
 
     <!-- Main donations table -->
@@ -85,22 +83,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Summary card (only shown if donations exist) -->
-    @if (Model != null && Model.Any())
-    {
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Summary</h5>
-                        <!-- Count total number of donations -->
-                        <p><strong>Total Donations:</strong> @Model.Count()</p>
-                        <!-- Sum all donation amounts and format as currency -->
-                        <p><strong>Total Amount:</strong> @Model.Sum(d => d.DonationAmount).ToString("C")</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>

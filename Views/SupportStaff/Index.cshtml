@@ -25,7 +25,7 @@
     <!-- Quick action buttons -->
     <div class="row mb-4">
         <!-- Record new donation card -->
-        <div class="col-md-3 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Record Donation</h5>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <!-- Daily report card -->
-        <div class="col-md-3 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Daily Report</h5>
@@ -49,19 +49,31 @@
             </div>
         </div>
         <!-- View all donations card -->
-        <div class="col-md-3 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>All Donations</h5>
-                    <p>Browse all records</p>
+                    <p>Browse all donation records</p>
                     <a asp-action="ViewDonations" class="btn btn-outline-secondary">
                         <i class="bi bi-list-ul"></i> View All
                     </a>
                 </div>
             </div>
         </div>
+        <!-- Manage congregants card -->
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5>Congregants</h5>
+                    <p>Manage members</p>
+                    <a asp-action="ViewCongregants" class="btn btn-outline-secondary">
+                        <i class="bi bi-people-fill"></i> Manage
+                    </a>
+                </div>
+            </div>
+        </div>
         <!-- Manage non-member donors card -->
-        <div class="col-md-3 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Non-Members</h5>

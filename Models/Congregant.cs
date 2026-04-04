@@ -5,8 +5,13 @@ namespace DonorTrackingSystem.Models
     // Enum to represent the active status of a congregant
     public enum ActiveStatus
     {
+        [Display(Name = "Current Member")]
         CurrentMember,
+        
+        [Display(Name = "Transferred Membership")]
         TransferredMembership,
+        
+        [Display(Name = "Left Church")]
         LeftChurch
     }
 
@@ -19,7 +24,7 @@ namespace DonorTrackingSystem.Models
         public string Name { get; set; } = string.Empty;
 
         [EmailAddress]
-        public string EmailAddress { get; set; } = string.Empty;
+        public string? EmailAddress { get; set; }
 
         [Phone]
         [Display(Name = "Phone Number")]

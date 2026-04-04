@@ -149,6 +149,39 @@ namespace DonorTrackingSystem.Controllers
             return View(donations);
         }
 
+        // GET: Add Congregant
+        public IActionResult AddCongregant()
+        {
+            return View();
+        }
+
+        // POST: Add Congregant
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddCongregant(Congregant congregant)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Congregants.Add(congregant);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Congregant added successfully! ID: {congregant.ID} - {congregant.Name}";
+                return RedirectToAction(nameof(ViewCongregants));
+            }
+
+            return View(congregant);
+        }
+
+        // GET: View Congregants
+        public async Task<IActionResult> ViewCongregants()
+        {
+            var congregants = await _context.Congregants
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            return View(congregants);
+        }
+
         // GET: Add Non-Member Donor
         public IActionResult AddNonMember()
         {
