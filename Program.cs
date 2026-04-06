@@ -3,6 +3,7 @@
    Justin Kim, Destini Liphart, Nursang Sherpa, Jerome Whitaker
    Group 1: Team Project
    CISS 491: Business Software Development
+   April 7th, 2026
  */
 
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +72,7 @@ app.UseAuthorization();
 app.UseSession();
 
 
-
+// Default route configuration
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
