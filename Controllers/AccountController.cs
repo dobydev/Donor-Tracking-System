@@ -79,8 +79,11 @@ namespace DonorTrackingSystem.Controllers
                         }
                     }
                 }
-                // If sign-in fails, add an error to the model state
-                ModelState.AddModelError("", "Login Failure.");
+                // If sign-in fails, add specific and user-friendly error message
+                else
+                {
+                    ModelState.AddModelError("", "Invalid Login ID or Password. Please try again.");
+                }
             }
             return View(vm);
         }
@@ -94,6 +97,7 @@ namespace DonorTrackingSystem.Controllers
             return RedirectToAction("Login");
         }
 
+        // Placeholder for the default index action, can be customized as needed
         public IActionResult Index()
         {
             return View();
