@@ -2,6 +2,52 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+<!-- Just a place hodler for now, style inspired by a project I did recently  -->
+<style>
+    .coming-soon-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f1f1f1 0%, #d3d3d3 100%);
+        border-radius: 15px;
+        margin: 2rem 0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .coming-soon-content {
+        text-align: center;
+        color: black;
+        padding: 3rem;
+    }
+
+    .coming-soon-logo {
+        max-width: 500px;
+    }
+
+    .coming-soon-title {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .coming-soon-description {
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+</style>
+
+<div class="coming-soon-container">
+    <div class="coming-soon-content">
+        <img src="~/Donor_Logo.png" alt="Donor Tracking System Logo" class="coming-soon-logo" style="width:;" />
+        <h1 class="coming-soon-title">Great Things Are Coming Soon!</h1>
+        <p class="coming-soon-description">
+            The Donor Tracking System home page is currently under development. 
+            Stay tuned for updates that will enhance your experience.
+        </p>
+    </div>
 </div>
