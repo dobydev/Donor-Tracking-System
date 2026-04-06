@@ -216,7 +216,7 @@ namespace DonorTrackingSystem.Controllers
         }
 
         // GET: Add Non-Member Donor
-        public IActionResult AddNonMember()
+        public IActionResult AddNonCongregant()
         {
             return View();
         }
