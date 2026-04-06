@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace DonorTrackingSystem.Models
 {
     // Represents a donation in the donor tracking system
+
     public class Donation
     {
         // Unique identifier for the donation record
@@ -26,7 +27,6 @@ namespace DonorTrackingSystem.Models
         // Date when the donation was made (defaults to today)
         [Required]
         [Display(Name = "Donation Date")]
-        [DataType(DataType.Date)]
         public DateTime DonationDate { get; set; } = DateTime.Now;
 
         // ID of the fund where this donation should be allocated
@@ -55,5 +55,13 @@ namespace DonorTrackingSystem.Models
         [Required]
         [Display(Name = "Staff Member ID")]
         public int StaffMemberID { get; set; }
+
+        // Timestamp when the donation record was created
+        private DateTimeOffset _created;
+        public DateTimeOffset Created
+        {
+            get => _created;
+            set => _created = value.ToUniversalTime();
+        }
     }
 }

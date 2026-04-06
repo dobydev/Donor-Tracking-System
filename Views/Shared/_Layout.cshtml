@@ -21,17 +21,18 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-sm-start">
+                <div class="navbar-collapse collapse d-flex justify-content-sm-start">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="SupportStaff" asp-action="Index">Support Staff</a>
+                            </li>
+                        </ul>
                     </ul>
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="SupportStaff" asp-action="Index">Support Staff</a>
-                        </li>
-                    </ul>
+                 
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <ul class="navbar-nav">

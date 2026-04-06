@@ -79,7 +79,7 @@
                         <table class="table table-striped table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Time</th>
+                                    <th>Time Recorded</th>
                                     <th>Envelope #</th>
                                     <th>Donor Name</th>
                                     <th>Amount</th>
@@ -95,9 +95,9 @@
                                     @foreach (var donation in Model)
                                     {
                                         <tr>
-                                            <!-- Display time of donation -->
-                                            <td>@donation.DonationDate.ToShortTimeString()</td>
-                                            
+                                            <!-- Display time recorded -->
+                                            <td>@donation.Created.ToLocalTime().ToString("h:mm tt")</td>
+
                                             <!-- Envelope Number column: show envelope # if exists, otherwise "-" -->
                                             <td>
                                                 @if (!string.IsNullOrWhiteSpace(donation.EnvelopeNumber))
@@ -147,6 +147,7 @@
                                             
                                             <!-- Display staff member who recorded it -->
                                             <td>@donation.StaffMemberID</td>
+                                           
                                         </tr>
                                     }
                                 }

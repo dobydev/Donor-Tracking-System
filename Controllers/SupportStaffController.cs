@@ -96,6 +96,9 @@ namespace DonorTrackingSystem.Controllers
                     donation.StaffMemberID = staffId;
                 }
 
+                // Set creation timestamp
+                donation.Created = DateTimeOffset.Now;
+
                 _context.Donations.Add(donation);
                 await _context.SaveChangesAsync();
 
