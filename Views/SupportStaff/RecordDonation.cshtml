@@ -61,18 +61,17 @@
                                 <option value="">-- Select Congregant (Optional) --</option>
                             </select>
                             <span asp-validation-for="CongregantID" class="text-danger"></span>
-                            <small class="form-text text-muted">Optional - select if from church member, or <a asp-action="AddCongregant" target="_blank">add new congregant</a></small>
+                            <small class="form-text text-muted">Optional - select if from church member</small>
                         </div>
 
                         <!-- Non-Member Donor dropdown (optional) -->
                         <div class="mb-3">
-                            <label asp-for="NonMemberID" class="form-label">Non-Member Donor</label>
-                            <!-- Dropdown list of non-member donors -->
-                            <select asp-for="NonMemberID" class="form-select" asp-items="ViewBag.NonMembers">
-                                <option value="">-- Select Non-Member (Optional) --</option>
+                            <label asp-for="NonCongregantID" class="form-label">Non-Congregant Donor</label>
+                            <!-- Dropdown list of non-congregant donors including Anonymous option -->
+                            <select asp-for="NonCongregantID" class="form-select" asp-items="ViewBag.NonCongregants">
                             </select>
-                            <span asp-validation-for="NonMemberID" class="text-danger"></span>
-                            <small class="form-text text-muted">Optional - select if from non-member, or <a asp-action="AddNonMember" target="_blank">add new non-member</a></small>
+                            <span asp-validation-for="NonCongregantID" class="text-danger"></span>
+                            <small class="form-text text-muted">Select "Anonymous" for anonymous donations, or <a asp-action="AddNonCongregant" target="_blank">add new non-congregant</a></small>
                         </div>
 
                         <!-- Donation Amount -->

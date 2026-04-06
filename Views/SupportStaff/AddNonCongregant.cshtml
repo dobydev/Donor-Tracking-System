@@ -1,9 +1,9 @@
-@model DonorTrackingSystem.Models.NonMember
+@model DonorTrackingSystem.Models.NonCongregant
 @{
-    ViewData["Title"] = "Add Non-Member Donor";
+    ViewData["Title"] = "Add Non-Congregant Donor";
 }
 
-<!-- Main container for non-member donor form -->
+<!-- Main container for non-congregant donor form -->
 <div class="container mt-4">
     <div class="row">
         <!-- Center the form on larger screens -->
@@ -13,8 +13,8 @@
                     <h3>Add Non-Member Donor</h3>
                 </div>
                 <div class="card-body">
-                    <!-- Form submits to AddNonMember action -->
-                    <form asp-action="AddNonMember" method="post">
+                    <!-- Form submits to AddNonCongregant action -->
+                    <form asp-action="AddNonCongregant" method="post">
                         <!-- Security token to prevent cross-site request forgery -->
                         @Html.AntiForgeryToken()
                         
@@ -57,11 +57,11 @@
 
                         <!-- Form action buttons -->
                         <div class="d-flex justify-content-between">
-                            <!-- Cancel button returns to view non-members list -->
-                            <a asp-action="ViewNonMembers" class="btn btn-secondary">Cancel</a>
-                            <!-- Submit button saves the non-member donor -->
+                            <!-- Cancel button returns to view non-congregant donors list -->
+                            <a asp-action="ViewNonCongregant" class="btn btn-secondary">Cancel</a>
+                            <!-- Submit button saves the non-congregant donor -->
                             <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Save Non-Member Donor
+                                <i class="bi bi-save"></i> Save Non-Congregant Donor
                             </button>
                         </div>
                     </form>

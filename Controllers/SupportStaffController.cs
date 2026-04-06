@@ -26,7 +26,7 @@ namespace DonorTrackingSystem.Controllers
             var recentDonations = await _context.Donations
                 .Include(d => d.FundDesignation)
                 .Include(d => d.Congregant)
-                .Include(d => d.NonMember)
+                .Include(d => d.NonCongregant)
                 .OrderByDescending(d => d.DonationDate)
                 .Take(10)
                 .ToListAsync();
@@ -56,8 +56,8 @@ namespace DonorTrackingSystem.Controllers
                 .ToList();
             ViewBag.Congregants = new SelectList(congregants, "ID", "DisplayName");
 
-            // Populate non-member donors dropdown (optional)
-            var nonMembers = _context.NonMembers
+            // Populate non-congregant donors dropdown (optional)
+            var nonCongregants = _context.NonCongregants
                 .Select(n => new
                 {
                     n.ID,
@@ -67,7 +67,19 @@ namespace DonorTrackingSystem.Controllers
                 })
                 .OrderBy(n => n.DisplayName)
                 .ToList();
-            ViewBag.NonMembers = new SelectList(nonMembers, "ID", "DisplayName");
+
+            // Add "Anonymous" option to the beginning of the list
+            var nonMembersWithAnonymous = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "-- Select Non-Congregant (Optional) --" },
+                new SelectListItem { Value = "-1", Text = "Anonymous" }
+            };
+            nonMembersWithAnonymous.AddRange(nonCongregants.Select(n => new SelectListItem 
+            { 
+                Value = n.ID.ToString(), 
+                Text = n.DisplayName 
+            }));
+            ViewBag.NonCongregants = nonMembersWithAnonymous;
 
             var donation = new Donation
             {
@@ -84,6 +96,12 @@ namespace DonorTrackingSystem.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Handle anonymous donations (special value -1)
+                if (donation.NonCongregantID == -1)
+                {
+                    donation.NonCongregantID = null;
+                }
+
                 // Auto-assign Donor ID starting from 1000
                 var maxDonorId = await _context.Donations
                     .MaxAsync(d => (int?)d.DonorID) ?? 999; // Start at 999 so first ID will be 1000
@@ -125,8 +143,8 @@ namespace DonorTrackingSystem.Controllers
                 .ToList();
             ViewBag.Congregants = new SelectList(congregants, "ID", "DisplayName");
 
-            // Repopulate non-member donors dropdown
-            var nonMembers = _context.NonMembers
+            // Repopulate non-congregant donors dropdown
+            var nonCongregants = _context.NonCongregants
                 .Select(n => new
                 {
                     n.ID,
@@ -136,7 +154,19 @@ namespace DonorTrackingSystem.Controllers
                 })
                 .OrderBy(n => n.DisplayName)
                 .ToList();
-            ViewBag.NonMembers = new SelectList(nonMembers, "ID", "DisplayName");
+
+            // Add "Anonymous" option to the beginning of the list
+            var nonMembersWithAnonymous = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "-- Select Non-Member (Optional) --" },
+                new SelectListItem { Value = "-1", Text = "Anonymous" }
+            };
+            nonMembersWithAnonymous.AddRange(nonCongregants.Select(n => new SelectListItem 
+            { 
+                Value = n.ID.ToString(), 
+                Text = n.DisplayName 
+            }));
+            ViewBag.NonCongregants = nonMembersWithAnonymous;
 
             return View(donation);
         }
@@ -194,30 +224,30 @@ namespace DonorTrackingSystem.Controllers
         // POST: Add Non-Member Donor
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddNonMember(NonMember nonMember)
+        public async Task<IActionResult> AddNonCongregant(NonCongregant nonCongregant)
         {
             if (ModelState.IsValid)
             {
-                _context.NonMembers.Add(nonMember);
+                _context.NonCongregants.Add(nonCongregant);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Non-member donor added successfully! Donor ID: {nonMember.ID}";
-                return RedirectToAction(nameof(ViewNonMembers));
+                TempData["SuccessMessage"] = $"Non-congregant donor added successfully! Donor ID: {nonCongregant.ID}";
+                return RedirectToAction(nameof(ViewNonCongregants));
             }
 
-            return View(nonMember);
+            return View(nonCongregant);
         }
 
-        // GET: View Non-Members
-        public async Task<IActionResult> ViewNonMembers()
+        // GET: View Non-Congregants
+        public async Task<IActionResult> ViewNonCongregants()
         {
-            var nonMembers = await _context.NonMembers
+            var nonCongregants = await _context.NonCongregants
                 .OrderBy(n => n.LastName)
                 .ThenBy(n => n.FirstName)
                 .ThenBy(n => n.CompanyOrganization)
                 .ToListAsync();
 
-            return View(nonMembers);
+            return View(nonCongregants);
         }
 
         // GET: Daily Donation Report
@@ -231,7 +261,7 @@ namespace DonorTrackingSystem.Controllers
             var todaysDonations = await _context.Donations
                 .Include(d => d.FundDesignation)
                 .Include(d => d.Congregant)
-                .Include(d => d.NonMember)
+                .Include(d => d.NonCongregant)
                 .Where(d => d.DonationDate >= today && d.DonationDate < tomorrow)
                 .OrderByDescending(d => d.DonationDate)
                 .ThenBy(d => d.ID)

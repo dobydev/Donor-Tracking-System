@@ -117,17 +117,17 @@
                                                     <!-- Display congregant name -->
                                                     <span>@donation.Congregant.Name</span>
                                                 }
-                                                else if (donation.NonMember != null)
+                                                else if (donation.NonCongregant != null)
                                                 {
-                                                    <!-- Display non-member donor name or company -->
-                                                    @if (!string.IsNullOrWhiteSpace(donation.NonMember.FirstName) || 
-                                                         !string.IsNullOrWhiteSpace(donation.NonMember.LastName))
+                                                    <!-- Display non-congregant donor name or company -->
+                                                    @if (!string.IsNullOrWhiteSpace(donation.NonCongregant.FirstName) || 
+                                                         !string.IsNullOrWhiteSpace(donation.NonCongregant.LastName))
                                                     {
-                                                        <span>@donation.NonMember.FirstName @donation.NonMember.LastName</span>
+                                                        <span>@donation.NonCongregant.FirstName @donation.NonCongregant.LastName</span>
                                                     }
-                                                    else if (!string.IsNullOrWhiteSpace(donation.NonMember.CompanyOrganization))
+                                                    else if (!string.IsNullOrWhiteSpace(donation.NonCongregant.CompanyOrganization))
                                                     {
-                                                        <span class="badge bg-info">@donation.NonMember.CompanyOrganization</span>
+                                                        <span class="badge bg-info">@donation.NonCongregant.CompanyOrganization</span>
                                                     }
                                                 }
                                                 else

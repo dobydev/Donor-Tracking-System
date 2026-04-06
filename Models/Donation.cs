@@ -44,12 +44,12 @@ namespace DonorTrackingSystem.Models
         // Navigation property to access congregant details
         public Congregant? Congregant { get; set; }
 
-        // Optional link to non-member donor (null if anonymous or congregant donation)
-        [Display(Name = "Non-Member Donor")]
-        public int? NonMemberID { get; set; }
+        // Optional link to non-congregant donor (null if anonymous or congregant donation)
+        [Display(Name = "Non-Congregant Donor")]
+        public int? NonCongregantID { get; set; }
 
-        // Navigation property to access non-member donor details
-        public NonMember? NonMember { get; set; }
+        // Navigation property to access non-congregant donor details
+        public NonCongregant? NonCongregant { get; set; }
 
         // ID of the staff member who recorded this donation
         [Required]

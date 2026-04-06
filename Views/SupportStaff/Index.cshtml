@@ -23,7 +23,7 @@
     }
 
     <!-- Quick action buttons -->
-    <div class="row mb-4">
+    <div class="row mb-4 d-flex justify-content-between">
         <!-- Record new donation card -->
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
@@ -48,19 +48,7 @@
                 </div>
             </div>
         </div>
-        <!-- View all donations card -->
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5>All Donations</h5>
-                    <p>Browse all donation records</p>
-                    <a asp-action="ViewDonations" class="btn btn-outline-secondary">
-                        <i class="bi bi-list-ul"></i> View All
-                    </a>
-                </div>
-            </div>
-        </div>
-        <!-- Manage congregants card -->
+        <!-- Manage congregants card
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
@@ -71,7 +59,7 @@
                     </a>
                 </div>
             </div>
-        </div>
+        </div>  -->
         <!-- Manage non-member donors card -->
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
@@ -131,9 +119,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>

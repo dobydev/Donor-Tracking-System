@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace DonorTrackingSystem.Models
 {
     // Represents a non-member donor in the donor tracking system
-    public class NonMember : IValidatableObject
+    public class NonCongregant : IValidatableObject
     {
         // Unique identifier for the non-member donor
         public int ID { get; set; }

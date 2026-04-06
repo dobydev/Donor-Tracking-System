@@ -1,14 +1,14 @@
-@model IEnumerable<DonorTrackingSystem.Models.NonMember>
+@model IEnumerable<DonorTrackingSystem.Models.NonCongregant>
 @{
-    ViewData["Title"] = "View Non-Member Donors";
+    ViewData["Title"] = "View Non-Congregant Donors";
 }
 
-<!-- Container for viewing all non-member donors -->
+<!-- Container for viewing all non-congregant donors -->
 <div class="container mt-4">
     <!-- Page header -->
     <div class="row mb-3">
         <div class="col-12">
-            <h2>Non-Member Donors</h2>
+            <h2>Non-Congregant Donors</h2>
             <hr />
         </div>
     </div>
@@ -24,9 +24,9 @@
 
     <!-- Navigation buttons -->
     <div class="d-flex justify-content-between mb-3">
-        <!-- Button to add a new non-member donor -->
-        <a asp-action="AddNonMember" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Non-Member Donor
+        <!-- Button to add a new non-congregant donor -->
+        <a asp-action="AddNonCongregant" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Non-Congregant Donor
         </a>
         <!-- Button to return to dashboard -->
         <a asp-action="Index" class="btn btn-secondary">

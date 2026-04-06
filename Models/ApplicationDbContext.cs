@@ -12,7 +12,7 @@ namespace DonorTrackingSystem.Models
         public DbSet<Donation> Donations { get; set; }
         public DbSet<FundDesignation> FundDesignations { get; set; }
         public DbSet<Congregant> Congregants { get; set; }
-        public DbSet<NonMember> NonMembers { get; set; }
+        public DbSet<NonCongregant> NonCongregants { get; set; }
         public DbSet<Committee> Committees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
