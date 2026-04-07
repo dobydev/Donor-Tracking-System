@@ -34,7 +34,7 @@
         </a>
     </div>
 
-    <!-- Main non-members table -->
+    <!-- Main non-congregant donors table -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -50,18 +50,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Check if there are non-members to display -->
+                                <!-- Check if there are non-congregants to display -->
                                 @if (Model != null && Model.Any())
                                 {
-                                    <!-- Loop through each non-member -->
-                                    @foreach (var nonMember in Model)
+                                    <!-- Loop through each non-congregant -->
+                                    @foreach (var nonCongregant in Model)
                                     {
                                         <tr>
                                             <td>
-                                                @if (!string.IsNullOrWhiteSpace(nonMember.FirstName) || !string.IsNullOrWhiteSpace(nonMember.LastName))
+                                                @if (!string.IsNullOrWhiteSpace(nonCongregant.FirstName) || !string.IsNullOrWhiteSpace(nonCongregant.LastName))
                                                 {
                                                     <!-- Display full name if available -->
-                                                    <span>@nonMember.FirstName @nonMember.LastName</span>
+                                                    <span>@nonCongregant.FirstName @nonCongregant.LastName</span>
                                                 }
                                                 else
                                                 {
@@ -70,10 +70,10 @@
                                                 }
                                             </td>
                                             <td>
-                                                @if (!string.IsNullOrWhiteSpace(nonMember.CompanyOrganization))
+                                                @if (!string.IsNullOrWhiteSpace(nonCongregant.CompanyOrganization))
                                                 {
                                                     <!-- Display company/org if available -->
-                                                    <span class="badge bg-info">@nonMember.CompanyOrganization</span>
+                                                    <span class="badge bg-info">@nonCongregant.CompanyOrganization</span>
                                                 }
                                                 else
                                                 {
@@ -82,12 +82,12 @@
                                                 }
                                             </td>
                                             <td>
-                                                @if (!string.IsNullOrWhiteSpace(nonMember.ContactDetails))
+                                                @if (!string.IsNullOrWhiteSpace(nonCongregant.ContactDetails))
                                                 {
                                                     <!-- Truncate long contact details -->
-                                                    @(nonMember.ContactDetails.Length > 50 
-                                                        ? nonMember.ContactDetails.Substring(0, 50) + "..." 
-                                                        : nonMember.ContactDetails)
+                                                    @(nonCongregant.ContactDetails.Length > 50 
+                                                        ? nonCongregant.ContactDetails.Substring(0, 50) + "..." 
+                                                        : nonCongregant.ContactDetails)
                                                 }
                                                 else
                                                 {
@@ -100,9 +100,9 @@
                                 }
                                 else
                                 {
-                                    <!-- Message when no non-members exist -->
+                                    <!-- Message when no non-congregants exist -->
                                     <tr>
-                                        <td colspan="4" class="text-center">No non-member donors found.</td>
+                                        <td colspan="4" class="text-center">No non-congregant donors found.</td>
                                     </tr>
                                 }
                             </tbody>
@@ -122,7 +122,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Summary</h5>
                         <!-- Count total number of non-member donors -->
-                        <p><strong>Total Non-Member Donors:</strong> @Model.Count()</p>
+                        <p><strong>Total Non-Congregant Donors:</strong> @Model.Count()</p>
                         <p><strong>Individual Donors:</strong> @Model.Count(n => !string.IsNullOrWhiteSpace(n.FirstName) || !string.IsNullOrWhiteSpace(n.LastName))</p>
                         <p><strong>Organization Donors:</strong> @Model.Count(n => !string.IsNullOrWhiteSpace(n.CompanyOrganization))</p>
                     </div>
