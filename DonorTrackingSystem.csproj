@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Admin\**" />
+    <Compile Remove="Views\Office Manager\**" />
+    <Content Remove="Views\Admin\**" />
+    <Content Remove="Views\Office Manager\**" />
+    <EmbeddedResource Remove="Views\Admin\**" />
+    <EmbeddedResource Remove="Views\Office Manager\**" />
+    <None Remove="Views\Admin\**" />
+    <None Remove="Views\Office Manager\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\Login.css" />
   </ItemGroup>
 
@@ -20,11 +31,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Admin\" />
-    <Folder Include="Views\Office Manager\" />
   </ItemGroup>
 
 </Project>

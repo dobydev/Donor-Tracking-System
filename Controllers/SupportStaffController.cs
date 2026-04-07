@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DonorTrackingSystem.Controllers
 {
+    // This controller is responsible for handling all actions related to support staff functionalities, such as recording donations, managing congregants and non-congregant donors, and generating reports. Access to this controller is restricted to users with the "Support Staff" role.
     [Authorize(Roles = "Support Staff")]
     public class SupportStaffController : Controller
     {
@@ -19,7 +20,9 @@ namespace DonorTrackingSystem.Controllers
             _userManager = userManager;
         }
 
-        // GET: Support Staff Dashboard
+        /// <summary>
+        /// This action method retrieves the most recent donations from the database, including related data such as fund designations, congregants, and non-congregant donors. The donations are ordered by date in descending order and limited to the 10 most recent entries. The retrieved data is then passed to the view for display on the support staff dashboard.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
             // Get recent donations with all related data
@@ -34,7 +37,12 @@ namespace DonorTrackingSystem.Controllers
             return View(recentDonations);
         }
 
-        // GET: Record Donation
+        /// <summary>
+        /// Displays the donation entry form with populated dropdown lists for fund designations, congregants, and non-congregant donors.
+        /// </summary>
+        /// <remarks>The returned view includes dropdowns for active fund designations, current
+        /// congregants, and non-congregant donors, including an option for anonymous donations. This method is used to initiate the donation recording process in the application.</remarks>
+        /// <returns>A view that allows users to record a new donation, pre-populated with relevant selection options.</returns>
         public IActionResult RecordDonation()
         {
             // Populate fund designations dropdown
@@ -89,7 +97,14 @@ namespace DonorTrackingSystem.Controllers
             return View(donation);
         }
 
-        // POST: Record Donation
+        /// <summary>
+        /// Processes and records a new donation, assigning donor and staff member information, and persists the sdonation to the database.
+        /// </summary>
+        /// <remarks>This action automatically assigns a unique DonorID starting from 1000 and associates
+        /// the donation with the currently authenticated staff member. If model validation fails, the method repopulates dropdown lists to preserve user input. Only accessible via HTTP POST and requires a valid anti-forgery token.</remarks>
+        /// <param name="donation">The donation to be recorded. Must contain valid donation details. If the NonCongregantID is -1, the donation will be recorded as anonymous.</param>
+        /// <returns>A redirect to the index view if the donation is successfully recorded; otherwise, returns the view with
+        /// validation errors and repopulated form data.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RecordDonation(Donation donation)
@@ -171,7 +186,12 @@ namespace DonorTrackingSystem.Controllers
             return View(donation);
         }
 
-        // GET: View Donations
+        /// <summary>
+        /// Displays a view listing all donations, ordered by most recent donation date.
+        /// </summary>
+        /// <remarks>The returned view includes related fund designation information for each donation.
+        /// The list is sorted in descending order by donation date.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that renders the donations view with a list of donation records.</returns>
         public async Task<IActionResult> ViewDonations()
         {
             var donations = await _context.Donations
@@ -182,13 +202,13 @@ namespace DonorTrackingSystem.Controllers
             return View(donations);
         }
 
-        // GET: Add Congregant
+        // Will be used to manage congregants and non-congregant donors, including adding new entries and viewing existing ones.
         public IActionResult AddCongregant()
         {
             return View();
         }
 
-        // POST: Add Congregant
+        // Will be implemented next sprint to handle the form submission for adding a new congregant, including validation and saving to the database.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCongregant(Congregant congregant)
@@ -205,7 +225,7 @@ namespace DonorTrackingSystem.Controllers
             return View(congregant);
         }
 
-        // GET: View Congregants
+        // Will be implemented next sprint to display a list of all congregants, ordered alphabetically by name, with options to edit or view details for each congregant.
         public async Task<IActionResult> ViewCongregants()
         {
             var congregants = await _context.Congregants
@@ -215,13 +235,23 @@ namespace DonorTrackingSystem.Controllers
             return View(congregants);
         }
 
-        // GET: Add Non-Member Donor
+       /// <summary>
+       /// Returns a view that allows the user to add a non-congregant record.
+       /// </summary>
+       /// <returns>A view result that renders the form for adding a non-congregant.</returns>
         public IActionResult AddNonCongregant()
         {
             return View();
         }
 
-        // POST: Add Non-Member Donor
+        /// <summary>
+        /// Handles the HTTP POST request to add a new non-congregant donor to the system.
+        /// </summary>
+        /// <remarks>This action requires a valid anti-forgery token. If model validation fails, the user
+        /// is presented with the form to correct input errors.</remarks>
+        /// <param name="nonCongregant">The non-congregant donor information to add. Must contain valid data as required by the model.</param>
+        /// <returns>A redirect to the list of non-congregant donors if the addition is successful; otherwise, returns the view
+        /// with validation errors.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNonCongregant(NonCongregant nonCongregant)
@@ -238,7 +268,12 @@ namespace DonorTrackingSystem.Controllers
             return View(nonCongregant);
         }
 
-        // GET: View Non-Congregants
+        /// <summary>
+        /// Retrieves a list of non-congregant individuals and displays them in a view, ordered by last name, first
+        /// name, and company or organization.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>
+        /// that renders the view displaying the ordered list of non-congregants.</returns>
         public async Task<IActionResult> ViewNonCongregants()
         {
             var nonCongregants = await _context.NonCongregants
@@ -250,7 +285,14 @@ namespace DonorTrackingSystem.Controllers
             return View(nonCongregants);
         }
 
-        // GET: Daily Donation Report
+        
+        /// <summary>
+        /// Generates a daily report of donations for the current day, including summary statistics and a list of today's donations.
+        /// </summary>
+        /// <remarks>The report includes the total number of donations, the total donation amount, counts
+        /// of envelope and non-envelope donations, and the report date. The donations list includes related fund designation and donor information. This action is used to display a summary of daily giving activity in an report-like interface.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that renders the daily donations report view with the relevant data for the
+        /// current day.</returns>
         public async Task<IActionResult> DailyReport()
         {
             // Get today's date (start and end of day)

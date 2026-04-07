@@ -1,9 +1,24 @@
 /* 
-   Alex Alvarado, Gabriel Doby, Prabesh Khanal, 
-   Justin Kim, Destini Liphart, Nursang Sherpa, Jerome Whitaker
+   Architecture Lead: Alex Alvarado
+
+   Backend Developer / Database Developer: Gabriel Doby
+
+   Product Owner: Justin Kim
+
+   QA/Test Lead: Destini Liphart
+
+   Design Lead: Nursang Sherpa
+
+   Scrum Master: Jerome Whitaker
+
    Group 1: Team Project
+
    CISS 491: Business Software Development
+
+   Professor: Jason Oesterly
+
    April 7th, 2026
+
  */
 
 using Microsoft.EntityFrameworkCore;

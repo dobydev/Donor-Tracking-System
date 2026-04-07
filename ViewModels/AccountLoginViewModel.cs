@@ -2,6 +2,7 @@
 
 namespace DonorTrackingSystem.ViewModels
 {
+    // ViewModel for account login
     public class AccountLoginViewModel
     {
         [Required]
