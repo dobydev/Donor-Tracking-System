@@ -135,8 +135,12 @@ namespace DonorTrackingSystem.Controllers
                 _context.Donations.Add(donation);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Donation recorded successfully! Donor ID: {donation.DonorID}";
+                TempData["SuccessMessage"] = $"Donation recorded successfully!";
                 return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to record donation, please check the input and try again.";
             }
 
             // Repopulate dropdown on error
@@ -261,8 +265,12 @@ namespace DonorTrackingSystem.Controllers
                 _context.NonCongregants.Add(nonCongregant);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Non-congregant donor added successfully! Donor ID: {nonCongregant.ID}";
+                TempData["SuccessMessage"] = $"Non-congregant donor added successfully!";
                 return RedirectToAction(nameof(ViewNonCongregants));
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to add non-congregant donor to the database, please try again.";
             }
 
             return View(nonCongregant);
