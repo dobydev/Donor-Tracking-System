@@ -50,34 +50,10 @@ namespace DonorTrackingSystem.Controllers
                 // Identity: attempt password sign-in using ID as username
                 var result = await signInManager.PasswordSignInAsync(vm.ID.ToString(), vm.Password.ToString(), false, false);
 
-                // If sign-in is successful, redirect to the appropriate page based on user role
+                // If sign-in is successful, redirect to home page
                 if (result.Succeeded)
                 {
-                    // Identity: get user and their roles
-                    var user = await userManager.FindByNameAsync(vm.ID.ToString());
-                    if (user != null)
-                    {
-                        var roles = await userManager.GetRolesAsync(user);
-
-                        // Redirect based on user role
-                        if (roles.Contains("Administrator"))
-                        {
-                            return RedirectToAction("Index", "Administrator");
-                        }
-                        else if (roles.Contains("Office Manager"))
-                        {
-                            return RedirectToAction("Index", "OfficeManager");
-                        }
-                        else if (roles.Contains("Support Staff"))
-                        {
-                            return RedirectToAction("Index", "SupportStaff");
-                        }
-                        else
-                        {
-                            // Default redirect if no specific role is found
-                            return RedirectToAction("Index", "Home");
-                        }
-                    }
+                    return RedirectToAction("Index", "Home");
                 }
                 // If sign-in fails, add specific and user-friendly error message
                 else

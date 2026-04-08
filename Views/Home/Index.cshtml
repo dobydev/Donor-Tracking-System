@@ -1,53 +1,81 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home - Donor Tracking System";
 }
 
-<!-- Just a place hodler for now, style inspired by a project I did recently  -->
-<style>
-    .coming-soon-container {
-        min-height: 70vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #f1f1f1 0%, #d3d3d3 100%);
-        border-radius: 15px;
-        margin: 2rem 0;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
+<!-- Custom styles for the home page -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
 
-    .coming-soon-content {
-        text-align: center;
-        color: black;
-        padding: 3rem;
-    }
+<div class="home-container">
+    <div class="home-content">
+        <img src="~/Donor_Logo.png" alt="Donor Tracking System Logo" class="home-logo" />
 
-    .coming-soon-logo {
-        max-width: 500px;
-    }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <p class="welcome-message">
+                Welcome back ! , <span class="user-id">User ID: @User.Identity.Name</span>
+            </p>
+        }
 
-    .coming-soon-title {
-        font-size: 3rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
+        <h1 class="home-title">Congregant and Donor Tracking System</h1>
 
-    .coming-soon-description {
-        font-size: 1.1rem;
-        max-width: 600px;
-        margin: 0 auto;
-        opacity: 0.9;
-        line-height: 1.6;
-    }
-</style>
-
-<div class="coming-soon-container">
-    <div class="coming-soon-content">
-        <img src="~/Donor_Logo.png" alt="Donor Tracking System Logo" class="coming-soon-logo" style="width:;" />
-        <h1 class="coming-soon-title">Great Things Are Coming Soon!</h1>
-        <p class="coming-soon-description">
-            The Donor Tracking System home page is currently under development. 
-            Stay tuned for updates that will enhance your experience.
+        <p class="mission-statement">
+            This application functions as a tracking system for congregants
+            and donors at our church, which has approximately 450 members.
+            Its goal is to monitor congregation members and donations from
+            both congregants and non-congregants. Donation data is intended
+            for end-of-year tax reporting and church budgeting/financial planning forecasting.
         </p>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="dashboard-section">
+                <h3 class="dashboard-title">Access your Dashboard(s)</h3>
+                <div class="dashboard-buttons">
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-controller="Administrator" asp-action="Index" class="btn btn-dashboard btn-admin">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Administrator Dashboard</span>
+                        </a>
+                        <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
+                            <i class="bi bi-person-workspace"></i>
+                            <span>Office Manager Dashboard</span>
+                        </a>
+                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                            <i class="bi bi-headset"></i>
+                            <span>Support Staff Dashboard</span>
+                        </a>
+                    }
+                    @if (User.IsInRole("Office Manager"))
+                    {
+                        <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
+                            <i class="bi bi-person-workspace"></i>
+                            <span>Office Manager Dashboard</span>
+                        </a>
+                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                            <i class="bi bi-headset"></i>
+                            <span>Support Staff Dashboard</span>
+                        </a>
+                    }
+                    @if (User.IsInRole("Support Staff"))
+                    {
+                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                            <i class="bi bi-headset"></i>
+                            <span>Support Staff Dashboard</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="login-section">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i> Login to Access System
+                </a>
+            </div>
+        }
     </div>
 </div>
