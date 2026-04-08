@@ -1,0 +1,40 @@
+@model IEnumerable<DonorTrackingSystem.Models.Congregant>
+@{
+    ViewData["Title"] = "Office Manager Dashboard";
+}
+
+<!-- Main dashboard container -->
+<div class="container mt-4">
+    <!-- Page header -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center">Office Manager Dashboard</h2>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Success message notification (appears after recording a donation) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Quick action buttons -->
+    <div class="row mb-4 d-flex justify-content-between">
+        <!-- Manage congregants card -->
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5>Congregants</h5>
+                    <p>Manage members</p>
+                    <a asp-action="ViewCongregants" class="btn btn-outline-secondary">
+                        <i class="bi bi-people-fill"></i> Manage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

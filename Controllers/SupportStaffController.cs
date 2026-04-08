@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DonorTrackingSystem.Controllers
 {
     // This controller is responsible for handling all actions related to support staff functionalities, such as recording donations, managing congregants and non-congregant donors, and generating reports. Access to this controller is restricted to users with the "Support Staff" role.
-    [Authorize(Roles = "Support Staff")]
+    [Authorize(Roles = "Support Staff, Office Manager")]
     public class SupportStaffController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -204,39 +204,6 @@ namespace DonorTrackingSystem.Controllers
                 .ToListAsync();
 
             return View(donations);
-        }
-
-        // Will be used to manage congregants and non-congregant donors, including adding new entries and viewing existing ones.
-        public IActionResult AddCongregant()
-        {
-            return View();
-        }
-
-        // Will be implemented next sprint to handle the form submission for adding a new congregant, including validation and saving to the database.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCongregant(Congregant congregant)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Congregants.Add(congregant);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = $"Congregant added successfully! ID: {congregant.ID} - {congregant.Name}";
-                return RedirectToAction(nameof(ViewCongregants));
-            }
-
-            return View(congregant);
-        }
-
-        // Will be implemented next sprint to display a list of all congregants, ordered alphabetically by name, with options to edit or view details for each congregant.
-        public async Task<IActionResult> ViewCongregants()
-        {
-            var congregants = await _context.Congregants
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-
-            return View(congregants);
         }
 
        /// <summary>

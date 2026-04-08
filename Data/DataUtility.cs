@@ -8,7 +8,7 @@ namespace DonorTrackingSystem.Data
         public static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             // Define roles
-            string[] roles = { "Administrator", "Officer Manager", "Support Staff" };
+            string[] roles = { "Administrator", "Office Manager", "Support Staff" };
 
             // Create roles if they do not exist
             foreach (var role in roles)
@@ -24,8 +24,8 @@ namespace DonorTrackingSystem.Data
             // Administrator: ID 1000, Password 123456
             await CreateUserIfNotExists(userManager, "1000", "123456", "Administrator");
 
-            // Officer Manager: ID 2000, Password 654321
-            await CreateUserIfNotExists(userManager, "2000", "654321", "Officer Manager");
+            // Office Manager: ID 2000, Password 654321
+            await CreateUserIfNotExists(userManager, "2000", "654321", "Office Manager");
 
             // Support Staff: ID 3000, Password 111111
             await CreateUserIfNotExists(userManager, "3000", "111111", "Support Staff");

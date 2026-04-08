@@ -64,7 +64,7 @@ namespace DonorTrackingSystem.Controllers
                         {
                             return RedirectToAction("Index", "Administrator");
                         }
-                        else if (roles.Contains("Officer Manager"))
+                        else if (roles.Contains("Office Manager"))
                         {
                             return RedirectToAction("Index", "OfficeManager");
                         }
