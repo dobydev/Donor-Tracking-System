@@ -3,10 +3,22 @@ body {
     background: #f4f6f9;
 }
 
+/* Logo Container */
+.login-logo-container {
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 1.5rem;
+}
+
+.login-logo {
+    width: 400px;
+    max-width: 50%;
+}
+
 /* Login Card */
 .login-card {
-    max-width: 420px;
-    margin: 60px auto;
+    max-width: 450px;
+    margin: 0 auto 60px;
     padding: 2rem;
     border-radius: 1.25rem;
     background: #ffffff;

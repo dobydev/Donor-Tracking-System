@@ -7,75 +7,61 @@
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 }
 
-<div class="home-container">
-    <div class="home-content">
-        <img src="~/Donor_Logo.png" alt="Donor Tracking System Logo" class="home-logo" />
 
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            <p class="welcome-message">
-                Welcome back ! , <span class="user-id">User ID: @User.Identity.Name</span>
+
+<div class="dashboard-card">
+
+    <div class="dashboard-content">
+        <div class="mission-section">
+            <h2 class="mission-statement-title">Mission Statement</h2>
+            <p class="mission-statement">
+                Our mission is to faithfully serve our congregation by responsibly caring for
+                member and donation records with accuracy, integrity, and transparency.
+                Through this system, we seek to support the day-to-day work of our church staff,
+                strengthen our stewardship, and ensure that every gift is handled with care and accountability.
             </p>
-        }
-
-        <h1 class="home-title">Congregant and Donor Tracking System</h1>
-
-        <p class="mission-statement">
-            This application functions as a tracking system for congregants
-            and donors at our church, which has approximately 450 members.
-            Its goal is to monitor congregation members and donations from
-            both congregants and non-congregants. Donation data is intended
-            for end-of-year tax reporting and church budgeting/financial planning forecasting.
-        </p>
+        </div>
 
         @if (User.Identity?.IsAuthenticated == true)
         {
             <div class="dashboard-section">
-                <h3 class="dashboard-title">Access your Dashboard(s)</h3>
+                <h3 class="dashboard-section-title">Access your Dashboard(s)</h3>
                 <div class="dashboard-buttons">
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <a asp-controller="Administrator" asp-action="Index" class="btn btn-dashboard btn-admin">
-                            <i class="bi bi-shield-lock"></i>
-                            <span>Administrator Dashboard</span>
-                        </a>
-                        <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
-                            <i class="bi bi-person-workspace"></i>
-                            <span>Office Manager Dashboard</span>
-                        </a>
-                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
-                            <i class="bi bi-headset"></i>
-                            <span>Support Staff Dashboard</span>
-                        </a>
-                    }
-                    @if (User.IsInRole("Office Manager"))
-                    {
-                        <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
-                            <i class="bi bi-person-workspace"></i>
-                            <span>Office Manager Dashboard</span>
-                        </a>
-                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
-                            <i class="bi bi-headset"></i>
-                            <span>Support Staff Dashboard</span>
-                        </a>
-                    }
-                    @if (User.IsInRole("Support Staff"))
-                    {
-                        <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
-                            <i class="bi bi-headset"></i>
-                            <span>Support Staff Dashboard</span>
-                        </a>
-                    }
-                </div>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <a asp-controller="Administrator" asp-action="Index" class="btn btn-dashboard btn-admin">
+                        <i class="bi bi-shield-lock"></i>
+                        <span>Administrator Dashboard</span>
+                    </a>
+                    <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
+                        <i class="bi bi-person-workspace"></i>
+                        <span>Office Manager Dashboard</span>
+                    </a>
+                    <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                        <i class="bi bi-headset"></i>
+                        <span>Support Staff Dashboard</span>
+                    </a>
+                }
+                @if (User.IsInRole("Office Manager"))
+                {
+                    <a asp-controller="OfficeManager" asp-action="Index" class="btn btn-dashboard btn-manager">
+                        <i class="bi bi-person-workspace"></i>
+                        <span>Office Manager Dashboard</span>
+                    </a>
+                    <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                        <i class="bi bi-headset"></i>
+                        <span>Support Staff Dashboard</span>
+                    </a>
+                }
+                @if (User.IsInRole("Support Staff"))
+                {
+                    <a asp-controller="SupportStaff" asp-action="Index" class="btn btn-dashboard btn-staff">
+                        <i class="bi bi-headset"></i>
+                        <span>Support Staff Dashboard</span>
+                    </a>
+                }
             </div>
-        }
-        else
-        {
-            <div class="login-section">
-                <a asp-controller="Account" asp-action="Login" class="btn btn-login">
-                    <i class="bi bi-box-arrow-in-right"></i> Login to Access System
-                </a>
-            </div>
+        </div>
         }
     </div>
 </div>

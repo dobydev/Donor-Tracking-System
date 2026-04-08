@@ -1,68 +1,83 @@
-/* Home page styles */
 
-.home-container {
-    min-height: 70vh;
+/* Dashboard Card Wrapper */
+.dashboard-card {
+    background: #f1f1f1;
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
+    gap: 3rem;
 }
 
-.home-content {
-    text-align: center;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
+.home-image img {
+    width: 400px;
+    max-width: 100%;
+    height: auto;
 }
 
-.home-logo {
-    max-width: 450px;
-    margin-bottom: 2rem;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+/* Dashboard Content Container */
+.dashboard-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-.welcome-message {
-    font-size: 1.8rem;
+.mission-statement-title {
+    font-size: 2rem;
     font-weight: 500;
-    margin-bottom: 1rem;
-    color: #333;
+    margin-bottom: 1.5rem;
+    color: #000080;
+    line-height: 1.0;
+    letter-spacing: -0.5px;
 }
 
 .user-id {
-    color: #667eea;
-    font-weight: bold;
+    color: #d96b2b;
+    font-weight: 700;
 }
 
-.home-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-    color: #2c3e50;
-    line-height: 1.2;
+/* Mission Statement Section */
+.mission-section {
+    width: 100%;
+    padding: 0;
+    text-align: center;
 }
 
 .mission-statement {
-    font-size: 1.15rem;
+    font-size: 2.05rem;
     line-height: 1.8;
     color: #555;
-    margin-bottom: 2.5rem;
-    padding: 0 1rem;
+    margin: 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #d96b2b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
-/* Dashboard Section */
-.dashboard-section {
-    margin-top: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8f0f7 100%);
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(26, 58, 107, 0.15);
-}
-
-.dashboard-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1a3a6b;
+.dashboard-section-title {
+    font-size: 2rem;
+    font-weight: 500;
     margin-bottom: 1.5rem;
+    color: #000080;
+    line-height: 1.0;
+    letter-spacing: -0.5px;
+}
+
+.dashboard-section {
+    width: 100%;
+    padding: 1.5rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #000080;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-buttons {
@@ -82,7 +97,7 @@
     font-weight: 600;
     border-radius: 10px;
     text-decoration: none;
-    color: white;
+    color: black;
     transition: all 0.3s ease;
     width: 100%;
     max-width: 400px;
@@ -93,14 +108,8 @@
     font-size: 1.5rem;
 }
 
-.btn-dashboard:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    color: white;
-}
-
 .btn-admin {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #000080;
 }
 
 .btn-admin:hover {
@@ -108,63 +117,66 @@
 }
 
 .btn-manager {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.btn-manager:hover {
-    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    background: #cc5500;
 }
 
 .btn-staff {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.btn-staff:hover {
-    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-}
-
-/* Login Section */
-.login-section {
-    margin-top: 2rem;
-}
-
-.btn-login {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2.5rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    border-radius: 50px;
-    text-decoration: none;
-    color: white;
-    background: linear-gradient(135deg, #d96b2b 0%, #d4a843 100%);
-    box-shadow: 0 4px 15px rgba(217, 107, 43, 0.4);
-    transition: all 0.3s ease;
-}
-
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(217, 107, 43, 0.6);
-    color: white;
+    background: #008080;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .home-title {
-        font-size: 2rem;
+@media (max-width: 992px) {
+    .dashboard-card {
+        flex-direction: column;
+        gap: 2rem;
     }
 
-    .welcome-message {
-        font-size: 1.5rem;
+    .home-image img {
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .home-image img {
+        width: 280px;
     }
 
     .mission-statement {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        padding: 1.25rem;
+    }
+
+    .dashboard-section {
+        padding: 1.25rem;
+    }
+
+    .mission-statement-title,
+    .dashboard-section-title {
+        font-size: 1.5rem;
     }
 
     .btn-dashboard {
         font-size: 1rem;
-        padding: 0.875rem 1.5rem;
+        padding: 1rem 1.75rem;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-image img {
+        width: 220px;
+    }
+
+    .mission-statement-title,
+    .dashboard-section-title {
+        font-size: 1.3rem;
+    }
+
+    .btn-dashboard i {
+        font-size: 1.2rem;
     }
 }

@@ -141,7 +141,7 @@ namespace DonorTrackingSystem.Controllers
         /// <returns>A redirect to the list of congregants with a success message.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ArchiveCongregant(int id)
+        public async Task<IActionResult> DeactivateCongregant(int id)
         {
             // Retrieve the congregant from the database using the provided ID
             var congregant = await _context.Congregants.FindAsync(id);
