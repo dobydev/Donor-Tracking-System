@@ -41,7 +41,6 @@
                         <table class="table table-striped table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
@@ -54,7 +53,6 @@
                                     @foreach (var congregant in Model)
                                     {
                                         <tr>
-                                            <td>@congregant.ID</td>
                                             <td>@congregant.Name</td>
                                             <td>
                                                 @if (!string.IsNullOrWhiteSpace(congregant.EmailAddress))

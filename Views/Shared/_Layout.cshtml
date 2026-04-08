@@ -26,10 +26,20 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <!-- Role-based navigation -->
                         <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="SupportStaff" asp-action="Index">Support Staff</a>
-                            </li>
+                            @if (User.IsInRole("Support Staff"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="SupportStaff" asp-action="Index">Support Staff</a>
+                                </li>
+                            }
+                            @if (User.IsInRole("Office Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="OfficeManager" asp-action="Index">Office Manager</a>
+                                </li>
+                            }
                         </ul>
                     </ul>
                  

@@ -46,7 +46,7 @@ namespace DonorTrackingSystem.Controllers
                 _context.Congregants.Add(congregant);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Congregant added successfully! ID: {congregant.ID} - {congregant.Name}";
+                TempData["SuccessMessage"] = $"Congregant added successfully!";
                 return RedirectToAction(nameof(ViewCongregants));
             }
 
