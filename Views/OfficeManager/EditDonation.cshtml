@@ -1,0 +1,98 @@
+@model DonorTrackingSystem.Models.Donation
+@{
+    ViewData["Title"] = "Edit Donation";
+    var congregantId = ViewBag.CongregantID as int?;
+    var congregantName = ViewBag.CongregantName as string;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Donation
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Editing donation for:</strong> @congregantName
+                    </div>
+
+                    <form asp-action="EditDonation" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ID" />
+                        <input type="hidden" asp-for="CongregantID" />
+                        <input type="hidden" asp-for="NonCongregantID" />
+                        <input type="hidden" name="congregantId" value="@congregantId" />
+
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Donation Date -->
+                        <div class="mb-3">
+                            <label asp-for="DonationDate" class="form-label">
+                                Donation Date
+                            </label>
+                            <input asp-for="DonationDate" type="date" class="form-control" />
+                            <span asp-validation-for="DonationDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Donation Amount -->
+                        <div class="mb-3">
+                            <label asp-for="DonationAmount" class="form-label">
+                                 Donation Amount
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="DonationAmount" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="DonationAmount" class="text-danger"></span>
+                        </div>
+
+                        <!-- Fund Designation -->
+                        <div class="mb-3">
+                            <label asp-for="FundDesignationID" class="form-label">
+                               Fund Designation
+                            </label>
+                            <select asp-for="FundDesignationID" class="form-select" asp-items="ViewBag.FundDesignations">
+                                <option value="">-- Select Fund --</option>
+                            </select>
+                            <span asp-validation-for="FundDesignationID" class="text-danger"></span>
+                        </div>
+
+                        <!-- Envelope Number -->
+                        <div class="mb-3">
+                            <label asp-for="EnvelopeNumber" class="form-label">
+                                 Envelope Number (Optional)
+                            </label>
+                            <input asp-for="EnvelopeNumber" type="text" class="form-control" placeholder="Enter envelope number" />
+                            <span asp-validation-for="EnvelopeNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Action buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="CongregantDonationHistory" asp-route-id="@congregantId" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit History Note -->
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Note:</strong> Changes will be reflected immediately in all reports and donation history views.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

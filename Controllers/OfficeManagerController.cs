@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace DonorTrackingSystem.Controllers
@@ -180,6 +181,169 @@ namespace DonorTrackingSystem.Controllers
             }
 
             return RedirectToAction(nameof(ViewCongregants));
+        }
+
+        /// <summary>
+        /// Displays the donation history view where an Office Manager can select a congregant to view their donation history.
+        /// </summary>
+        /// <returns>A view with a list of active congregants to select from.</returns>
+        public async Task<IActionResult> ViewDonationHistory()
+        {
+            var congregants = await _context.Congregants
+                .Where(c => c.ActiveStatus == ActiveStatus.CurrentMember)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            return View(congregants);
+        }
+
+        /// <summary>
+        /// Displays the donation history for a specific congregant.
+        /// </summary>
+        /// <param name="id">The ID of the congregant whose donation history should be displayed.</param>
+        /// <returns>A view showing all donations made by the specified congregant, or NotFound if the congregant doesn't exist.</returns>
+        public async Task<IActionResult> CongregantDonationHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var congregant = await _context.Congregants.FindAsync(id);
+            if (congregant == null)
+            {
+                return NotFound();
+            }
+
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.CongregantID == id)
+                .OrderByDescending(d => d.DonationDate)
+                .ToListAsync();
+
+            ViewBag.CongregantName = congregant.Name;
+            ViewBag.CongregantID = congregant.ID;
+
+            return View(donations);
+        }
+
+        /// <summary>
+        /// Displays the edit form for a specific donation.
+        /// </summary>
+        /// <param name="id">The ID of the donation to edit.</param>
+        /// <param name="congregantId">The ID of the congregant to return to after editing.</param>
+        /// <returns>A view with the donation's current information for editing, or NotFound if the donation doesn't exist.</returns>
+        public async Task<IActionResult> EditDonation(int? id, int? congregantId)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var donation = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Include(d => d.Congregant)
+                .FirstOrDefaultAsync(d => d.ID == id);
+
+            if (donation == null)
+            {
+                return NotFound();
+            }
+
+            // Populate fund designations dropdown
+            ViewBag.FundDesignations = new SelectList(
+                _context.FundDesignations.Where(f => f.ActiveStatus),
+                "ID",
+                "Name",
+                donation.FundDesignationID
+            );
+
+            // Store congregant ID for return navigation
+            ViewBag.CongregantID = congregantId ?? donation.CongregantID;
+            ViewBag.CongregantName = donation.Congregant?.Name ?? "Unknown";
+
+            return View(donation);
+        }
+
+        /// <summary>
+        /// Handles the POST request to update a donation's information in the database.
+        /// </summary>
+        /// <param name="id">The ID of the donation to update.</param>
+        /// <param name="donation">The updated donation information.</param>
+        /// <param name="congregantId">The ID of the congregant to return to after editing.</param>
+        /// <returns>A redirect to the congregant's donation history if the update is successful; otherwise, returns the view with validation errors.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDonation(int id, Donation donation, int? congregantId)
+        {
+            if (id != donation.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Retrieve the original donation to preserve certain fields
+                    var originalDonation = await _context.Donations.AsNoTracking().FirstOrDefaultAsync(d => d.ID == id);
+                    if (originalDonation == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Preserve fields that shouldn't be modified
+                    donation.DonorID = originalDonation.DonorID;
+                    donation.StaffMemberID = originalDonation.StaffMemberID;
+                    donation.Created = originalDonation.Created;
+
+                    _context.Update(donation);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Donation updated successfully!";
+
+                    // Return to the congregant's donation history if congregantId is provided
+                    if (congregantId.HasValue)
+                    {
+                        return RedirectToAction(nameof(CongregantDonationHistory), new { id = congregantId });
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!DonationExists(donation.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            // Repopulate dropdown on error
+            ViewBag.FundDesignations = new SelectList(
+                _context.FundDesignations.Where(f => f.ActiveStatus),
+                "ID",
+                "Name",
+                donation.FundDesignationID
+            );
+
+            ViewBag.CongregantID = congregantId;
+
+            return View(donation);
+        }
+
+        /// <summary>
+        /// Checks if a donation exists in the database.
+        /// </summary>
+        /// <param name="id">The ID of the donation to check.</param>
+        /// <returns>True if the donation exists; otherwise, false.</returns>
+        private bool DonationExists(int id)
+        {
+            return _context.Donations.Any(e => e.ID == id);
         }
 
         /// <summary>

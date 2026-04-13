@@ -1,0 +1,101 @@
+@model IEnumerable<DonorTrackingSystem.Models.Congregant>
+@{
+    ViewData["Title"] = "View Congregant Donation History";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">View Congregant Donation History</h2>
+            <p class="text-center text-muted">Select a congregant to view their giving patterns and donation history</p>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Search box -->
+    <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search congregants by name..." />
+            </div>
+        </div>
+    </div>
+
+    <!-- Congregants list -->
+    <div class="row">
+        <div class="col-12">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="congregantsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th> Phone</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var congregant in Model)
+                            {
+                                <tr>
+                                    <td>@congregant.Name</td>
+                                    <td>@(congregant.EmailAddress ?? "N/A")</td>
+                                    <td>@(congregant.PhoneNumber ?? "N/A")</td>
+                                    <td class="text-center">
+                                        <a asp-action="CongregantDonationHistory" asp-route-id="@congregant.ID" 
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-cash-stack"></i> View History
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> No active congregants found.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchValue = this.value.toLowerCase();
+            var table = document.getElementById('congregantsTable');
+            var rows = table.getElementsByTagName('tr');
+
+            for (var i = 1; i < rows.length; i++) {
+                var name = rows[i].getElementsByTagName('td')[1];
+                if (name) {
+                    var textValue = name.textContent || name.innerText;
+                    if (textValue.toLowerCase().indexOf(searchValue) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        });
+    </script>
+}
