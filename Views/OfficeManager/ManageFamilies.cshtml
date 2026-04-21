@@ -1,0 +1,97 @@
+@model IEnumerable<DonorTrackingSystem.Models.Family>
+@{
+    ViewData["Title"] = "Manage Families";
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Family Groups</h2>
+            <hr />
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between mb-3">
+        <a asp-action="AddFamily" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Family
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-house"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Family Name</th>
+                                    <th>Members</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var family in Model)
+                                    {
+                                        <tr>
+                                            <td>@family.FamilyName</td>
+                                            <td>
+                                                @if (family.Members.Any())
+                                                {
+                                                    @string.Join(", ", family.Members.Select(m => m.Name))
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No members assigned</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a asp-action="EditFamily" asp-route-id="@family.ID" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center">No family groups found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Summary</h5>
+                        <p><strong>Total Families:</strong> @Model.Count()</p>
+                        <p><strong>Total Members Assigned:</strong> @Model.Sum(f => f.Members.Count)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -36,5 +36,12 @@ namespace DonorTrackingSystem.Models
 
         [Display(Name = "Committee Memberships")]
         public List<string> CommitteeMemberships { get; set; } = new List<string>();
+
+        // Optional link to a family/household group
+        [Display(Name = "Family")]
+        public int? FamilyID { get; set; }
+
+        // Navigation property to the family
+        public Family? Family { get; set; }
     }
 }

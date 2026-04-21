@@ -581,5 +581,158 @@ namespace DonorTrackingSystem.Controllers
             return _context.Congregants.Any(e => e.ID == id);
         }
 
+        /// <summary>
+        /// Displays a list of all family groups.
+        /// </summary>
+        public async Task<IActionResult> ManageFamilies()
+        {
+            var families = await _context.Families
+                .Include(f => f.Members)
+                .OrderBy(f => f.FamilyName)
+                .ToListAsync();
+
+            return View(families);
+        }
+
+        /// <summary>
+        /// Displays the form to create a new family group.
+        /// </summary>
+        public IActionResult AddFamily()
+        {
+            PopulateFamilyUnassignedCongregants();
+            return View(new Family());
+        }
+
+        /// <summary>
+        /// Handles POST to create a new family group and assign selected congregants.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFamily(Family family, int[] memberIds)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Families.Add(family);
+                await _context.SaveChangesAsync();
+
+                // Assign selected congregants to this family
+                if (memberIds.Length > 0)
+                {
+                    var members = await _context.Congregants
+                        .Where(c => memberIds.Contains(c.ID))
+                        .ToListAsync();
+
+                    foreach (var member in members)
+                    {
+                        member.FamilyID = family.ID;
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
+                TempData["SuccessMessage"] = $"Family '{family.FamilyName}' created successfully!";
+                return RedirectToAction(nameof(ManageFamilies));
+            }
+
+            PopulateFamilyUnassignedCongregants();
+            return View(family);
+        }
+
+        /// <summary>
+        /// Displays the form to edit a family group and manage its members.
+        /// </summary>
+        public async Task<IActionResult> EditFamily(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var family = await _context.Families
+                .Include(f => f.Members)
+                .FirstOrDefaultAsync(f => f.ID == id);
+
+            if (family == null) return NotFound();
+
+            // Available: unassigned active members + members already in this family
+            var available = await _context.Congregants
+                .Where(c => c.ActiveStatus == ActiveStatus.CurrentMember &&
+                            (c.FamilyID == null || c.FamilyID == id))
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            ViewBag.AvailableCongregants = available;
+            return View(family);
+        }
+
+        /// <summary>
+        /// Handles POST to update a family group name and member assignments.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditFamily(int id, Family family, int[] memberIds)
+        {
+            if (id != family.ID) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Update family name
+                    var existing = await _context.Families
+                        .Include(f => f.Members)
+                        .FirstOrDefaultAsync(f => f.ID == id);
+
+                    if (existing == null) return NotFound();
+
+                    existing.FamilyName = family.FamilyName;
+
+                    // Remove all current members from family
+                    foreach (var member in existing.Members)
+                    {
+                        member.FamilyID = null;
+                    }
+
+                    // Assign newly selected members
+                    if (memberIds.Length > 0)
+                    {
+                        var newMembers = await _context.Congregants
+                            .Where(c => memberIds.Contains(c.ID))
+                            .ToListAsync();
+
+                        foreach (var member in newMembers)
+                        {
+                            member.FamilyID = id;
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"Family '{existing.FamilyName}' updated successfully!";
+                    return RedirectToAction(nameof(ManageFamilies));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Families.Any(f => f.ID == id)) return NotFound();
+                    throw;
+                }
+            }
+
+            var availableOnError = await _context.Congregants
+                .Where(c => c.ActiveStatus == ActiveStatus.CurrentMember &&
+                            (c.FamilyID == null || c.FamilyID == id))
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            ViewBag.AvailableCongregants = availableOnError;
+            return View(family);
+        }
+
+        /// <summary>
+        /// Populates ViewBag with unassigned active congregants for family creation.
+        /// </summary>
+        private void PopulateFamilyUnassignedCongregants()
+        {
+            ViewBag.AvailableCongregants = _context.Congregants
+                .Where(c => c.ActiveStatus == ActiveStatus.CurrentMember && c.FamilyID == null)
+                .OrderBy(c => c.Name)
+                .ToList();
+        }
+
     }
 }

@@ -14,6 +14,7 @@ namespace DonorTrackingSystem.Models
         public DbSet<Congregant> Congregants { get; set; }
         public DbSet<NonCongregant> NonCongregants { get; set; }
         public DbSet<Committee> Committees { get; set; }
+        public DbSet<Family> Families { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -33,6 +34,13 @@ namespace DonorTrackingSystem.Models
                 entity.Ignore(u => u.LockoutEnabled);
                 entity.Ignore(u => u.AccessFailedCount);
             });
+
+            // Configure one-to-many: Family -> Congregants
+            builder.Entity<Congregant>()
+                .HasOne(c => c.Family)
+                .WithMany(f => f.Members)
+                .HasForeignKey(c => c.FamilyID)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Seed some default fund designations
             builder.Entity<FundDesignation>().HasData(

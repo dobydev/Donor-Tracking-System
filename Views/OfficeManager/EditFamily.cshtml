@@ -1,0 +1,77 @@
+@model DonorTrackingSystem.Models.Family
+@{
+    ViewData["Title"] = "Edit Family";
+    var availableCongregants = ViewBag.AvailableCongregants as IEnumerable<DonorTrackingSystem.Models.Congregant>;
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Edit Family Group</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="EditFamily" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ID" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Family Name -->
+                        <div class="mb-3">
+                            <label asp-for="FamilyName" class="form-label">Family Name</label>
+                            <input asp-for="FamilyName" class="form-control" />
+                            <span asp-validation-for="FamilyName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Member Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Assign Members</label>
+                            @if (availableCongregants != null && availableCongregants.Any())
+                            {
+                                <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
+                                    @foreach (var congregant in availableCongregants)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="memberIds" value="@congregant.ID"
+                                                   id="member-@congregant.ID"
+                                                   @(Model.Members.Any(m => m.ID == congregant.ID) ? "checked" : "") />
+                                            <label class="form-check-label" for="member-@congregant.ID">
+                                                @congregant.Name
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info mb-0">
+                                    No available congregants to assign.
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="ManageFamilies" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
