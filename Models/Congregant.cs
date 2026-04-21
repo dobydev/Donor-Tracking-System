@@ -34,6 +34,17 @@ namespace DonorTrackingSystem.Models
         [Display(Name = "Active Status")]
         public ActiveStatus ActiveStatus { get; set; } = ActiveStatus.CurrentMember;
 
+        [Display(Name = "Address")]
+        public string? Address { get; set; }
+
+        [Display(Name = "Birth Date")]
+        [DataType(DataType.Date)]
+        public DateTime? BirthDate { get; set; }
+
+        [Display(Name = "Join Date")]
+        [DataType(DataType.Date)]
+        public DateTime? JoinDate { get; set; }
+
         [Display(Name = "Committee Memberships")]
         public List<string> CommitteeMemberships { get; set; } = new List<string>();
 

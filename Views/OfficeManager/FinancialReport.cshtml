@@ -1,0 +1,54 @@
+@model DonorTrackingSystem.ViewModels.FinancialReportViewModel
+@{
+    ViewData["Title"] = "Financial Report";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Financial Report</h2>
+            <a asp-action="ExportFinancialReport" class="btn btn-outline-success">
+                <i class="bi bi-download"></i> Export CSV
+            </a>
+        </div>
+        <div class="col-12"><hr /></div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Month</th>
+                    <th class="text-end">@Model.CurrentYear YTD</th>
+                    <th class="text-end">@Model.PriorYear YTD</th>
+                    <th class="text-end">Difference</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.MonthlyRows)
+                {
+                    var diff = row.CurrentYtd - row.PriorYtd;
+                    <tr>
+                        <td>@row.MonthName</td>
+                        <td class="text-end">@row.CurrentYtd.ToString("C")</td>
+                        <td class="text-end">@row.PriorYtd.ToString("C")</td>
+                        <td class="text-end @(diff >= 0 ? "text-success" : "text-danger")">@diff.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-secondary fw-bold">
+                <tr>
+                    <td>Year Total</td>
+                    <td class="text-end">@Model.CurrentYearTotal.ToString("C")</td>
+                    <td class="text-end">@Model.PriorYearTotal.ToString("C")</td>
+                    @{
+                        var totalDiff = Model.CurrentYearTotal - Model.PriorYearTotal;
+                    }
+                    <td class="text-end @(totalDiff >= 0 ? "text-success" : "text-danger")">@totalDiff.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <a asp-action="Reports" class="btn btn-secondary mt-2"><i class="bi bi-arrow-left"></i> Back to Reports</a>
+</div>

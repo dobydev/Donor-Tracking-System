@@ -734,5 +734,292 @@ namespace DonorTrackingSystem.Controllers
                 .ToList();
         }
 
+        // ─── Reports ────────────────────────────────
+
+        /// <summary>
+        ///  This action serves as the main entry point for the reports section, providing an overview and navigation to specific report types such as forecasting, congregant details, non-member details, and financial summaries.
+        /// </summary>
+        /// <returns>An IActionResult representing the reports view.</returns>
+        public IActionResult Reports()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Generates a forecasting report of donation totals for the current and prior year, grouped by donor, and
+        /// returns the results to the view.
+        /// </summary>
+        /// <remarks>The report includes year-to-date totals for the current year, year-to-date totals for
+        /// the prior year up to the same day, and total donations for the prior year. Donors are grouped by name,
+        /// including both congregants and non-congregants. The results are ordered by current year-to-date total in
+        /// descending order.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that renders the forecasting report view with a list of donor summary rows.</returns>
+        public async Task<IActionResult> ForecastingReport()
+        {
+            var today = DateTime.Today;
+            var currentYear = today.Year;
+            var priorYear = currentYear - 1;
+            var priorYearSameDay = new DateTime(priorYear, today.Month, today.Day);
+
+            var donations = await _context.Donations
+                .Include(d => d.Congregant)
+                .Include(d => d.NonCongregant)
+                .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
+                .ToListAsync();
+
+            var rows = donations
+                .GroupBy(d => d.CongregantID.HasValue
+                    ? (d.Congregant?.Name ?? "Unknown")
+                    : (string.IsNullOrWhiteSpace(d.NonCongregant?.FirstName) && string.IsNullOrWhiteSpace(d.NonCongregant?.LastName)
+                        ? d.NonCongregant?.CompanyOrganization ?? "Unknown"
+                        : $"{d.NonCongregant?.FirstName} {d.NonCongregant?.LastName}".Trim()))
+                .Select(g => new DonorTrackingSystem.ViewModels.ForecastingReportRow
+                {
+                    DonorName = g.Key,
+                    YtdTotal = g.Where(d => d.DonationDate.Year == currentYear).Sum(d => d.DonationAmount),
+                    PriorYtdTotal = g.Where(d => d.DonationDate.Year == priorYear && d.DonationDate <= priorYearSameDay).Sum(d => d.DonationAmount),
+                    PriorYearTotal = g.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount)
+                })
+                .OrderByDescending(r => r.YtdTotal)
+                .ToList();
+
+            return View(rows);
+        }
+
+        /// <summary>
+        /// Handles HTTP requests to display a report of all congregants, ordered by name.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>
+        /// that renders the congregant report view with the list of congregants.</returns>
+        public async Task<IActionResult> CongregantReport()
+        {
+            var congregants = await _context.Congregants
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            return View(congregants);
+        }
+
+        /// <summary>
+        /// Generates a report of non-member donors, including their contact information and the date of their most
+        /// recent donation.
+        /// </summary>
+        /// <remarks>The report includes all non-member donors, sorted by last name, first name, and
+        /// organization. Each entry displays the donor's name, contact details, and the date of their last recorded
+        /// donation, if any.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that renders a view displaying a list of non-member donors and their latest
+        /// donation dates.</returns>
+        public async Task<IActionResult> NonMemberReport()
+        {
+            var nonCongregants = await _context.NonCongregants
+                .OrderBy(n => n.LastName).ThenBy(n => n.FirstName).ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+
+            var lastDonations = await _context.Donations
+                .Where(d => d.NonCongregantID.HasValue)
+                .GroupBy(d => d.NonCongregantID!.Value)
+                .Select(g => new { NonCongregantID = g.Key, LastDate = g.Max(d => d.DonationDate) })
+                .ToListAsync();
+
+            var rows = nonCongregants.Select(n =>
+            {
+                var name = (!string.IsNullOrWhiteSpace(n.FirstName) || !string.IsNullOrWhiteSpace(n.LastName))
+                    ? $"{n.FirstName} {n.LastName}".Trim()
+                    : n.CompanyOrganization ?? "Unknown";
+                var lastDonation = lastDonations.FirstOrDefault(d => d.NonCongregantID == n.ID)?.LastDate;
+                return new DonorTrackingSystem.ViewModels.NonMemberReportRow
+                {
+                    Name = name,
+                    ContactInfo = n.ContactDetails,
+                    LastDonationDate = lastDonation
+                };
+            }).ToList();
+
+            return View(rows);
+        }
+
+        /// <summary>
+        /// Generates a financial report comparing year-to-date donation totals for the current and prior year by month.
+        /// </summary>
+        /// <remarks>The report includes monthly and cumulative donation totals for both the current and
+        /// previous calendar years. The resulting view model provides data suitable for visualizing trends or
+        /// performing further analysis.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that renders the financial report view with year-over-year donation data.</returns>
+        public async Task<IActionResult> FinancialReport()
+        {
+            var today = DateTime.Today;
+            var currentYear = today.Year;
+            var priorYear = currentYear - 1;
+
+            var donations = await _context.Donations
+                .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
+                .ToListAsync();
+
+            var monthRows = Enumerable.Range(1, 12).Select(m =>
+            {
+                var currentYtd = donations
+                    .Where(d => d.DonationDate.Year == currentYear && d.DonationDate.Month <= m)
+                    .Sum(d => d.DonationAmount);
+                var priorYtd = donations
+                    .Where(d => d.DonationDate.Year == priorYear && d.DonationDate.Month <= m)
+                    .Sum(d => d.DonationAmount);
+                return new DonorTrackingSystem.ViewModels.FinancialReportRow
+                {
+                    Month = m,
+                    MonthName = new DateTime(currentYear, m, 1).ToString("MMMM"),
+                    CurrentYtd = currentYtd,
+                    PriorYtd = priorYtd
+                };
+            }).ToList();
+
+            var vm = new DonorTrackingSystem.ViewModels.FinancialReportViewModel
+            {
+                MonthlyRows = monthRows,
+                CurrentYearTotal = donations.Where(d => d.DonationDate.Year == currentYear).Sum(d => d.DonationAmount),
+                PriorYearTotal = donations.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount),
+                CurrentYear = currentYear,
+                PriorYear = priorYear
+            };
+
+            return View(vm);
+        }
+
+        // ─── CSV Exports ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Generates and returns a CSV file containing the forecasting report data for all donors.
+        /// </summary>
+        /// <remarks>The exported CSV includes columns for donor name, year-to-date total, prior
+        /// year-to-date total, and prior year total. This method is typically used to allow users to download
+        /// forecasting data for further analysis in spreadsheet applications.</remarks>
+        /// <returns>A file result containing the forecasting report as a CSV file. The file is named "ForecastingReport.csv" and
+        /// uses UTF-8 encoding.</returns>
+        public async Task<IActionResult> ExportForecastingReport()
+        {
+            var rows = (await GetForecastingRows()).ToList();
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Donor Name,YTD Total,Prior YTD Total,Prior Year Total");
+            foreach (var r in rows)
+                csv.AppendLine($"\"{r.DonorName}\",{r.YtdTotal},{r.PriorYtdTotal},{r.PriorYearTotal}");
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "ForecastingReport.csv");
+        }
+
+        /// <summary>
+        /// Generates and returns a CSV file containing a report of all congregants, including their name, address,
+        /// phone number, email address, birth date, and join date.
+        /// </summary>
+        /// <remarks>The report includes all congregants ordered by name. The CSV file is encoded in UTF-8
+        /// and includes headers for each field. This action is intended for download scenarios and returns the file as
+        /// an HTTP response with the appropriate content type.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that, when executed, sends a CSV file named "CongregantReport.csv" containing
+        /// the congregant report data to the client.</returns>
+        public async Task<IActionResult> ExportCongregantReport()
+        {
+            var congregants = await _context.Congregants.OrderBy(c => c.Name).ToListAsync();
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Name,Address,Phone,Email,Birth Date,Join Date");
+            foreach (var c in congregants)
+                csv.AppendLine($"\"{c.Name}\",\"{c.Address}\",\"{c.PhoneNumber}\",\"{c.EmailAddress}\",\"{c.BirthDate?.ToString("yyyy-MM-dd")}\",\"{c.JoinDate?.ToString("yyyy-MM-dd")}\"");
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "CongregantReport.csv");
+        }
+
+        /// <summary>
+        /// Generates and returns a CSV report containing non-member information and their most recent donation dates.
+        /// </summary>
+        /// <remarks>The report includes each non-member's name, contact information, and the date of
+        /// their last recorded donation, if available. The CSV file is encoded in UTF-8 and named
+        /// "NonMemberReport.csv".</remarks>
+        /// <returns>A file result containing the CSV report of non-members, suitable for download by the client.</returns>
+        public async Task<IActionResult> ExportNonCongregantReport()
+        {
+            var nonCongregants = await _context.NonCongregants
+                .OrderBy(n => n.LastName).ThenBy(n => n.FirstName).ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+            var lastDonations = await _context.Donations
+                .Where(d => d.NonCongregantID.HasValue)
+                .GroupBy(d => d.NonCongregantID!.Value)
+                .Select(g => new { NonCongregantID = g.Key, LastDate = g.Max(d => d.DonationDate) })
+                .ToListAsync();
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Name,Contact Info,Last Donation Date");
+            foreach (var n in nonCongregants)
+            {
+                var name = (!string.IsNullOrWhiteSpace(n.FirstName) || !string.IsNullOrWhiteSpace(n.LastName))
+                    ? $"{n.FirstName} {n.LastName}".Trim()
+                    : n.CompanyOrganization ?? "Unknown";
+                var lastDate = lastDonations.FirstOrDefault(d => d.NonCongregantID == n.ID)?.LastDate.ToString("yyyy-MM-dd");
+                csv.AppendLine($"\"{name}\",\"{n.ContactDetails}\",\"{lastDate}\"");
+            }
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "NonMemberReport.csv");
+        }
+
+        /// <summary>
+        /// Generates and returns a CSV file containing year-to-date donation totals by month for the current and prior
+        /// year.
+        /// </summary>
+        /// <remarks>The generated CSV includes monthly and total donation amounts for both the current
+        /// and previous calendar years. The report is intended for financial analysis and can be opened in spreadsheet
+        /// applications.</remarks>
+        /// <returns>An <see cref="IActionResult"/> that, when executed, sends a CSV file named "FinancialReport.csv" containing
+        /// the financial report data for download.</returns>
+        public async Task<IActionResult> ExportFinancialReport()
+        {
+            var today = DateTime.Today;
+            var currentYear = today.Year;
+            var priorYear = currentYear - 1;
+            var donations = await _context.Donations
+                .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
+                .ToListAsync();
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine($"Month,{currentYear} YTD,{priorYear} YTD");
+            foreach (var m in Enumerable.Range(1, 12))
+            {
+                var monthName = new DateTime(currentYear, m, 1).ToString("MMMM");
+                var cur = donations.Where(d => d.DonationDate.Year == currentYear && d.DonationDate.Month <= m).Sum(d => d.DonationAmount);
+                var pri = donations.Where(d => d.DonationDate.Year == priorYear && d.DonationDate.Month <= m).Sum(d => d.DonationAmount);
+                csv.AppendLine($"{monthName},{cur},{pri}");
+            }
+            var curTotal = donations.Where(d => d.DonationDate.Year == currentYear).Sum(d => d.DonationAmount);
+            var priTotal = donations.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount);
+            csv.AppendLine($"TOTAL,{curTotal},{priTotal}");
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "FinancialReport.csv");
+        }
+
+        /// <summary>
+        /// Retrieves forecasting report rows containing year-to-date and prior year donation totals for each donor.
+        /// </summary>
+        /// <remarks>Each report row includes the donor's name, the total donations for the current year
+        /// to date, the total donations for the same period in the prior year, and the total donations for the entire
+        /// prior year. Donors are grouped by name, and the results are ordered by current year-to-date total in
+        /// descending order.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of forecasting
+        /// report rows, each summarizing donation totals for a donor in the current and prior year.</returns>
+        private async Task<IEnumerable<DonorTrackingSystem.ViewModels.ForecastingReportRow>> GetForecastingRows()
+        {
+            var today = DateTime.Today;
+            var currentYear = today.Year;
+            var priorYear = currentYear - 1;
+            var priorYearSameDay = new DateTime(priorYear, today.Month, today.Day);
+            var donations = await _context.Donations
+                .Include(d => d.Congregant)
+                .Include(d => d.NonCongregant)
+                .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
+                .ToListAsync();
+            return donations
+                .GroupBy(d => d.CongregantID.HasValue
+                    ? (d.Congregant?.Name ?? "Unknown")
+                    : (string.IsNullOrWhiteSpace(d.NonCongregant?.FirstName) && string.IsNullOrWhiteSpace(d.NonCongregant?.LastName)
+                        ? d.NonCongregant?.CompanyOrganization ?? "Unknown"
+                        : $"{d.NonCongregant?.FirstName} {d.NonCongregant?.LastName}".Trim()))
+                .Select(g => new DonorTrackingSystem.ViewModels.ForecastingReportRow
+                {
+                    DonorName = g.Key,
+                    YtdTotal = g.Where(d => d.DonationDate.Year == currentYear).Sum(d => d.DonationAmount),
+                    PriorYtdTotal = g.Where(d => d.DonationDate.Year == priorYear && d.DonationDate <= priorYearSameDay).Sum(d => d.DonationAmount),
+                    PriorYearTotal = g.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount)
+                })
+                .OrderByDescending(r => r.YtdTotal);
+        }
+
     }
 }
