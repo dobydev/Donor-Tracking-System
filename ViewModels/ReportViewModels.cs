@@ -11,7 +11,7 @@ namespace DonorTrackingSystem.ViewModels
         public decimal PriorYearTotal { get; set; }
     }
 
-    public class NonMemberReportRow
+    public class NonCongregantReportRow
     {
         public string Name { get; set; } = string.Empty;
         public string? ContactInfo { get; set; }

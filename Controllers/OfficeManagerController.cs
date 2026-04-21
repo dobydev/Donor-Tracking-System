@@ -809,7 +809,7 @@ namespace DonorTrackingSystem.Controllers
         /// donation, if any.</remarks>
         /// <returns>An <see cref="IActionResult"/> that renders a view displaying a list of non-member donors and their latest
         /// donation dates.</returns>
-        public async Task<IActionResult> NonMemberReport()
+        public async Task<IActionResult> NonCongregantReport()
         {
             var nonCongregants = await _context.NonCongregants
                 .OrderBy(n => n.LastName).ThenBy(n => n.FirstName).ThenBy(n => n.CompanyOrganization)
@@ -827,7 +827,7 @@ namespace DonorTrackingSystem.Controllers
                     ? $"{n.FirstName} {n.LastName}".Trim()
                     : n.CompanyOrganization ?? "Unknown";
                 var lastDonation = lastDonations.FirstOrDefault(d => d.NonCongregantID == n.ID)?.LastDate;
-                return new DonorTrackingSystem.ViewModels.NonMemberReportRow
+                return new DonorTrackingSystem.ViewModels.NonCongregantReportRow
                 {
                     Name = name,
                     ContactInfo = n.ContactDetails,
@@ -850,6 +850,7 @@ namespace DonorTrackingSystem.Controllers
             var today = DateTime.Today;
             var currentYear = today.Year;
             var priorYear = currentYear - 1;
+            var totalDiff = currentYear - priorYear;
 
             var donations = await _context.Donations
                 .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
@@ -879,12 +880,12 @@ namespace DonorTrackingSystem.Controllers
                 PriorYearTotal = donations.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount),
                 CurrentYear = currentYear,
                 PriorYear = priorYear
-            };
+                };
 
             return View(vm);
         }
 
-        // ─── CSV Exports ──────────────────────────────────────────────────────────
+        // CSV Exports
 
         /// <summary>
         /// Generates and returns a CSV file containing the forecasting report data for all donors.
@@ -950,7 +951,7 @@ namespace DonorTrackingSystem.Controllers
                 var lastDate = lastDonations.FirstOrDefault(d => d.NonCongregantID == n.ID)?.LastDate.ToString("yyyy-MM-dd");
                 csv.AppendLine($"\"{name}\",\"{n.ContactDetails}\",\"{lastDate}\"");
             }
-            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "NonMemberReport.csv");
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "Non-CongregantReport.csv");
         }
 
         /// <summary>
@@ -967,11 +968,13 @@ namespace DonorTrackingSystem.Controllers
             var today = DateTime.Today;
             var currentYear = today.Year;
             var priorYear = currentYear - 1;
+            var totalDiff = currentYear - priorYear;
             var donations = await _context.Donations
                 .Where(d => d.DonationDate.Year == currentYear || d.DonationDate.Year == priorYear)
                 .ToListAsync();
             var csv = new System.Text.StringBuilder();
             csv.AppendLine($"Month,{currentYear} YTD,{priorYear} YTD");
+            // Calculate YTD totals for each month for both years
             foreach (var m in Enumerable.Range(1, 12))
             {
                 var monthName = new DateTime(currentYear, m, 1).ToString("MMMM");
@@ -979,6 +982,7 @@ namespace DonorTrackingSystem.Controllers
                 var pri = donations.Where(d => d.DonationDate.Year == priorYear && d.DonationDate.Month <= m).Sum(d => d.DonationAmount);
                 csv.AppendLine($"{monthName},{cur},{pri}");
             }
+            // Add totals row
             var curTotal = donations.Where(d => d.DonationDate.Year == currentYear).Sum(d => d.DonationAmount);
             var priTotal = donations.Where(d => d.DonationDate.Year == priorYear).Sum(d => d.DonationAmount);
             csv.AppendLine($"TOTAL,{curTotal},{priTotal}");
