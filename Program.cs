@@ -66,6 +66,10 @@ using (var scope = app.Services.CreateScope())
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await DonorTrackingSystem.Data.DataUtility.SeedUsersAsync(userManager, roleManager);
+
+    // Seed demo data
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    await DonorTrackingSystem.Data.DataUtility.SeedDemoDataAsync(context);
 }
 
 // Configure the HTTP request pipeline.
