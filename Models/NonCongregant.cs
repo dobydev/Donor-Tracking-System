@@ -24,6 +24,10 @@ namespace DonorTrackingSystem.Models
         [Display(Name = "Contact Details")]
         public string? ContactDetails { get; set; }
 
+        // Active status to track if the non-congregant donor is active or inactive
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
+
         // Custom validation to ensure either name or company/organization is provided
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

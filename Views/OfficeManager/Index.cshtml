@@ -36,6 +36,18 @@
                 </div>
             </div>
         </div>
+        <!-- Manage non-congregants card -->
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5>Non-Congregants</h5>
+                    <p>Manage non-congregant donors</p>
+                    <a asp-action="ViewNonCongregants" class="btn btn-outline-secondary">
+                        <i class="bi bi-people"></i> Manage
+                    </a>
+                </div>
+            </div>
+        </div>
         <!-- Support Staff Dashboard -->
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card dashboard-card">
@@ -54,6 +66,17 @@
                     <h5>Congregant Donation History</h5>
                     <p>View giving patterns</p>
                     <a asp-action="ViewDonationHistory" class="btn btn-outline-secondary">
+                        <i class="bi bi-clock-history"></i> View History
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5>Non-Congregant Donation History</h5>
+                    <p>View non-congregant giving patterns</p>
+                    <a asp-action="ViewNonCongregantDonationHistory" class="btn btn-outline-secondary">
                         <i class="bi bi-clock-history"></i> View History
                     </a>
                 </div>

@@ -23,7 +23,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th> Phone</th>
+                                <th>Phone</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -65,25 +65,3 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Simple search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            var searchValue = this.value.toLowerCase();
-            var table = document.getElementById('congregantsTable');
-            var rows = table.getElementsByTagName('tr');
-
-            for (var i = 1; i < rows.length; i++) {
-                var name = rows[i].getElementsByTagName('td')[1];
-                if (name) {
-                    var textValue = name.textContent || name.innerText;
-                    if (textValue.toLowerCase().indexOf(searchValue) > -1) {
-                        rows[i].style.display = '';
-                    } else {
-                        rows[i].style.display = 'none';
-                    }
-                }
-            }
-        });
-    </script>
-}

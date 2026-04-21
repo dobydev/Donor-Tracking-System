@@ -1,0 +1,95 @@
+@model IEnumerable<DonorTrackingSystem.Models.NonCongregant>
+@{
+    ViewData["Title"] = "View Non-Member Donation History";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">View Non-Member Donation History</h2>
+            <p class="text-center text-muted">Select a non-member donor to view their giving patterns and donation history</p>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Non-congregants list -->
+    <div class="row">
+        <div class="col-12">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="nonCongregantTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Company/Organization</th>
+                                <th>Contact Details</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var nonCongregant in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(nonCongregant.FirstName) || !string.IsNullOrWhiteSpace(nonCongregant.LastName))
+                                        {
+                                            <span>@nonCongregant.FirstName @nonCongregant.LastName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(nonCongregant.CompanyOrganization))
+                                        {
+                                            <span>@nonCongregant.CompanyOrganization</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(nonCongregant.ContactDetails))
+                                        {
+                                            @(nonCongregant.ContactDetails.Length > 50
+                                                ? nonCongregant.ContactDetails.Substring(0, 50) + "..."
+                                                : nonCongregant.ContactDetails)
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="NonCongregantDonationHistory" asp-route-id="@nonCongregant.ID"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-cash-stack"></i> View History
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> No non-member donors found.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

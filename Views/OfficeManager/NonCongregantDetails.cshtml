@@ -1,0 +1,294 @@
+@model DonorTrackingSystem.Models.NonCongregant
+@{
+    ViewData["Title"] = "Non-Congregant Donor Details";
+    var donations = ViewBag.Donations as IEnumerable<DonorTrackingSystem.Models.Donation>;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-3">
+                <i class="bi bi-person-lines-fill"></i> Non-Congregant Donor Details
+            </h2>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Donor information card -->
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header @(Model.IsActive ? "bg-primary" : "bg-secondary") text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-badge"></i>
+                        @if (!string.IsNullOrWhiteSpace(Model.FirstName) || !string.IsNullOrWhiteSpace(Model.LastName))
+                        {
+                            @($"{Model.FirstName} {Model.LastName}".Trim())
+                        }
+                        else
+                        {
+                            @Model.CompanyOrganization
+                        }
+                        @if (!Model.IsActive)
+                        {
+                            <span class="badge bg-danger ms-2">Inactive</span>
+                        }
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">
+                                <i class="bi bi-hash"></i> Donor ID
+                            </h6>
+                            <p class="mb-0">
+                                <span class="badge bg-secondary">@Model.ID</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">
+                                <i class="bi bi-activity"></i> Status
+                            </h6>
+                            <p class="mb-0">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactive
+                                    </span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.FirstName) || !string.IsNullOrWhiteSpace(Model.LastName))
+                    {
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">
+                                    <i class="bi bi-person"></i> First Name
+                                </h6>
+                                <p class="mb-0">@(Model.FirstName ?? "-")</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">
+                                    <i class="bi bi-person"></i> Last Name
+                                </h6>
+                                <p class="mb-0">@(Model.LastName ?? "-")</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.CompanyOrganization))
+                    {
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <h6 class="text-muted">
+                                    <i class="bi bi-building"></i> Company/Organization
+                                </h6>
+                                <p class="mb-0">
+                                    <span class="badge bg-info">@Model.CompanyOrganization</span>
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <h6 class="text-muted">
+                                <i class="bi bi-telephone"></i> Contact Details
+                            </h6>
+                            <p class="mb-0">@(Model.ContactDetails ?? "-")</p>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <a asp-action="EditNonCongregant" asp-route-id="@Model.ID" class="btn btn-warning">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+                        @if (Model.IsActive)
+                        {
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deactivateModal">
+                                <i class="bi bi-x-circle"></i> Deactivate
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reactivateModal">
+                                <i class="bi bi-arrow-clockwise"></i> Reactivate
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation history section -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="bi bi-cash-stack"></i> Donation History
+            </h3>
+
+            @if (donations != null && donations.Any())
+            {
+                var totalDonations = donations.Sum(d => d.DonationAmount);
+                var donationCount = donations.Count();
+                var averageDonation = totalDonations / donationCount;
+                var lastDonationDate = donations.Max(d => d.DonationDate);
+
+                <!-- Summary statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Total Donations</h6>
+                                <h3 class="card-title text-success">@totalDonations.ToString("C")</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Number of Donations</h6>
+                                <h3 class="card-title text-primary">@donationCount</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Average Donation</h6>
+                                <h3 class="card-title text-info">@averageDonation.ToString("C")</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Last Donation</h6>
+                                <h3 class="card-title text-warning">@lastDonationDate.ToString("MM/dd/yyyy")</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donations table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> Detailed Donation Records
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Fund Designation</th>
+                                        <th>Envelope #</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var donation in donations)
+                                    {
+                                        <tr>
+                                            <td>@donation.DonationDate.ToString("MM/dd/yyyy")</td>
+                                            <td>
+                                                <strong class="text-success">@donation.DonationAmount.ToString("C")</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    @(donation.FundDesignation?.Name ?? "N/A")
+                                                </span>
+                                            </td>
+                                            <td>@(donation.EnvelopeNumber ?? "N/A")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th class="text-end">Total:</th>
+                                        <th class="text-success">@totalDonations.ToString("C")</th>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> No donation history found for this non-member donor.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a asp-action="ViewNonCongregants" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Non-Members List
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Deactivate Modal -->
+<div class="modal fade" id="deactivateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Deactivate Non-Member Donor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to deactivate this non-member donor?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="DeactivateNonCongregant" asp-route-id="@Model.ID" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Deactivate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reactivate Modal -->
+<div class="modal fade" id="reactivateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Reactivate Non-Member Donor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reactivate this non-member donor?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="ReactivateNonCongregant" asp-route-id="@Model.ID" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success">Reactivate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

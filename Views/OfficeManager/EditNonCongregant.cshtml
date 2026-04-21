@@ -1,0 +1,99 @@
+@model DonorTrackingSystem.Models.NonCongregant
+@{
+    ViewData["Title"] = "Edit Non-Congregant Donor";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Non-Congregant Donor
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditNonCongregant" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ID" />
+
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Note:</strong> Either First/Last Name OR Company/Organization must be provided.
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="mb-3">
+                            <label asp-for="FirstName" class="form-label">
+                                <i class="bi bi-person"></i> First Name
+                            </label>
+                            <input asp-for="FirstName" type="text" class="form-control" placeholder="Enter first name (optional)" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="mb-3">
+                            <label asp-for="LastName" class="form-label">
+                                <i class="bi bi-person"></i> Last Name
+                            </label>
+                            <input asp-for="LastName" type="text" class="form-control" placeholder="Enter last name (optional)" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Company/Organization -->
+                        <div class="mb-3">
+                            <label asp-for="CompanyOrganization" class="form-label">
+                                <i class="bi bi-building"></i> Company/Organization
+                            </label>
+                            <input asp-for="CompanyOrganization" type="text" class="form-control" placeholder="Enter company or organization name (optional)" />
+                            <span asp-validation-for="CompanyOrganization" class="text-danger"></span>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="mb-3">
+                            <label asp-for="ContactDetails" class="form-label">
+                                <i class="bi bi-telephone"></i> Contact Details
+                            </label>
+                            <textarea asp-for="ContactDetails" class="form-control" rows="3" placeholder="Enter phone, email, address, or other contact information (optional)"></textarea>
+                            <span asp-validation-for="ContactDetails" class="text-danger"></span>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive" type="checkbox" class="form-check-input" id="isActiveCheck" />
+                                <label class="form-check-label" for="isActiveCheck">
+                                    <i class="bi bi-check-circle"></i> Active Donor
+                                </label>
+                            </div>
+                            <small class="text-muted">Uncheck to deactivate this non-member donor</small>
+                        </div>
+
+                        <!-- Action buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="ViewNonCongregants" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit warning -->
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Note:</strong> Changes will be reflected immediately in all reports and donation records.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

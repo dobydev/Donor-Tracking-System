@@ -1,0 +1,137 @@
+@model IEnumerable<DonorTrackingSystem.Models.Donation>
+@{
+    ViewData["Title"] = "Donation History";
+    var nonCongregantName = ViewBag.NonCongregantName as string;
+    var nonCongregantID = ViewBag.NonCongregantID as int?;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-3">Donation History</h2>
+            <h4 class="text-center text-primary mb-4">
+                <i class="bi bi-person-circle"></i> @nonCongregantName
+            </h4>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Summary statistics -->
+    @if (Model != null && Model.Any())
+    {
+        var totalDonations = Model.Sum(d => d.DonationAmount);
+        var donationCount = Model.Count();
+        var averageDonation = totalDonations / donationCount;
+        var lastDonationDate = Model.Max(d => d.DonationDate);
+
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Total Donations
+                        </h6>
+                        <h3 class="card-title text-success">@totalDonations.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Number of Donations
+                        </h6>
+                        <h3 class="card-title text-primary">@donationCount</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Average Donation
+                        </h6>
+                        <h3 class="card-title text-info">@averageDonation.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Last Donation
+                        </h6>
+                        <h3 class="card-title text-warning">@lastDonationDate.ToString("MM/dd/yyyy")</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donations table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> Detailed Donation Records
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Fund Designation</th>
+                                        <th>Envelope #</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var donation in Model)
+                                    {
+                                        <tr>
+                                            <td>@donation.DonationDate.ToString("MM/dd/yyyy")</td>
+                                            <td>
+                                                <strong class="text-success">@donation.DonationAmount.ToString("C")</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    @(donation.FundDesignation?.Name ?? "N/A")
+                                                </span>
+                                            </td>
+                                            <td>@(donation.EnvelopeNumber ?? "N/A")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th class="text-end">Total:</th>
+                                        <th class="text-success">@totalDonations.ToString("C")</th>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">No donations found for this non-congregant donor.</div>
+    }
+
+    <!-- Action buttons -->
+    <div class="row mt-4">
+        <div class="col-12 text-center d-flex justify-content-between">
+            <a asp-action="ViewNonCongregantDonationHistory" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Non-Congregant List
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>

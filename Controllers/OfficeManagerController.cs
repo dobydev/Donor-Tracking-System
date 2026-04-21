@@ -228,6 +228,231 @@ namespace DonorTrackingSystem.Controllers
         }
 
         /// <summary>
+        /// Displays the donation history selection view where an Office Manager can select a non-congregant to view their donation history.
+        /// </summary>
+        /// <returns>A view with a list of all non-congregant donors to select from.</returns>
+        public async Task<IActionResult> ViewNonCongregantDonationHistory()
+        {
+            var nonCongregants = await _context.NonCongregants
+                .OrderBy(n => n.LastName)
+                .ThenBy(n => n.FirstName)
+                .ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+
+            return View(nonCongregants);
+        }
+
+        /// <summary>
+        /// Displays the donation history for a specific non-congregant donor.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant whose donation history should be displayed.</param>
+        /// <returns>A view showing all donations made by the specified non-congregant, or NotFound if they don't exist.</returns>
+        public async Task<IActionResult> NonCongregantDonationHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var nonCongregant = await _context.NonCongregants.FindAsync(id);
+            if (nonCongregant == null)
+            {
+                return NotFound();
+            }
+
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.NonCongregantID == id)
+                .OrderByDescending(d => d.DonationDate)
+                .ToListAsync();
+
+            var displayName = !string.IsNullOrWhiteSpace(nonCongregant.FirstName) || !string.IsNullOrWhiteSpace(nonCongregant.LastName)
+                ? $"{nonCongregant.FirstName} {nonCongregant.LastName}".Trim()
+                : nonCongregant.CompanyOrganization;
+
+            ViewBag.NonCongregantName = displayName;
+            ViewBag.NonCongregantID = nonCongregant.ID;
+
+            return View(donations);
+        }
+
+        /// <summary>
+        /// Retrieves and displays a list of all non-congregant donors, ordered by name and company.
+        /// </summary>
+        /// <returns>A view showing all non-congregant donor records.</returns>
+        public async Task<IActionResult> ViewNonCongregants()
+        {
+            var nonCongregants = await _context.NonCongregants
+                .OrderBy(n => n.IsActive ? 0 : 1) // Active first
+                .ThenBy(n => n.LastName)
+                .ThenBy(n => n.FirstName)
+                .ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+
+            return View(nonCongregants);
+        }
+
+        /// <summary>
+        /// Displays the details for a specific non-congregant donor.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to view.</param>
+        /// <returns>A view with the non-congregant's details, or NotFound if they don't exist.</returns>
+        public async Task<IActionResult> NonCongregantDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var nonCongregant = await _context.NonCongregants.FindAsync(id);
+            if (nonCongregant == null)
+            {
+                return NotFound();
+            }
+
+            // Get donation history for this non-congregant
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.NonCongregantID == id)
+                .OrderByDescending(d => d.DonationDate)
+                .ToListAsync();
+
+            ViewBag.Donations = donations;
+
+            return View(nonCongregant);
+        }
+
+        /// <summary>
+        /// Displays the edit form for a specific non-congregant donor.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to edit.</param>
+        /// <returns>A view with the non-congregant's current information for editing, or NotFound if they don't exist.</returns>
+        public async Task<IActionResult> EditNonCongregant(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var nonCongregant = await _context.NonCongregants.FindAsync(id);
+            if (nonCongregant == null)
+            {
+                return NotFound();
+            }
+
+            return View(nonCongregant);
+        }
+
+        /// <summary>
+        /// Handles the POST request to update a non-congregant's information in the database.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to update.</param>
+        /// <param name="nonCongregant">The updated non-congregant information.</param>
+        /// <returns>A redirect to the non-congregants list if the update is successful; otherwise, returns the view with validation errors.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditNonCongregant(int id, NonCongregant nonCongregant)
+        {
+            if (id != nonCongregant.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(nonCongregant);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Non-congregant donor updated successfully!";
+                    return RedirectToAction(nameof(ViewNonCongregants));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!NonCongregantExists(nonCongregant.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return View(nonCongregant);
+        }
+
+        /// <summary>
+        /// Deactivates a non-congregant donor by setting their IsActive status to false.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to deactivate.</param>
+        /// <returns>A redirect to the non-congregants list with a success message.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeactivateNonCongregant(int id)
+        {
+            var nonCongregant = await _context.NonCongregants.FindAsync(id);
+            if (nonCongregant != null)
+            {
+                nonCongregant.IsActive = false;
+                _context.Update(nonCongregant);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Non-congregant donor '{GetNonCongregantDisplayName(nonCongregant)}' has been deactivated.";
+            }
+
+            return RedirectToAction(nameof(ViewNonCongregants));
+        }
+
+        /// <summary>
+        /// Reactivates a non-congregant donor by setting their IsActive status to true.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to reactivate.</param>
+        /// <returns>A redirect to the non-congregants list with a success message.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReactivateNonCongregant(int id)
+        {
+            var nonCongregant = await _context.NonCongregants.FindAsync(id);
+            if (nonCongregant != null)
+            {
+                nonCongregant.IsActive = true;
+                _context.Update(nonCongregant);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Non-congregant donor '{GetNonCongregantDisplayName(nonCongregant)}' has been reactivated.";
+            }
+
+            return RedirectToAction(nameof(ViewNonCongregants));
+        }
+
+        /// <summary>
+        /// Helper method to get a display name for a non-congregant.
+        /// </summary>
+        /// <param name="nonCongregant">The non-congregant donor.</param>
+        /// <returns>A string representing the non-congregant's name or company.</returns>
+        private string GetNonCongregantDisplayName(NonCongregant nonCongregant)
+        {
+            if (!string.IsNullOrWhiteSpace(nonCongregant.FirstName) || !string.IsNullOrWhiteSpace(nonCongregant.LastName))
+            {
+                return $"{nonCongregant.FirstName} {nonCongregant.LastName}".Trim();
+            }
+            return nonCongregant.CompanyOrganization ?? "Unknown";
+        }
+
+        /// <summary>
+        /// Checks if a non-congregant exists in the database.
+        /// </summary>
+        /// <param name="id">The ID of the non-congregant to check.</param>
+        /// <returns>True if the non-congregant exists; otherwise, false.</returns>
+        private bool NonCongregantExists(int id)
+        {
+            return _context.NonCongregants.Any(e => e.ID == id);
+        }
+
+        /// <summary>
         /// Displays the edit form for a specific donation.
         /// </summary>
         /// <param name="id">The ID of the donation to edit.</param>
