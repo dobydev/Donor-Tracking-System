@@ -1025,5 +1025,246 @@ namespace DonorTrackingSystem.Controllers
                 .OrderByDescending(r => r.YtdTotal);
         }
 
+        // Tax Letters 
+
+        /// <summary>
+        /// This action serves as the main entry point for the tax letters section, providing an overview and navigation to specific tax letter types such as family tax letters, non-congregant tax letters, and individual tax letters for both congregants and non-congregants.
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult TaxLetters()
+        {
+            ViewBag.CurrentYear = DateTime.Today.Year;
+            return View();
+        }
+
+        /// <summary>
+        /// Generates and displays tax letter data for each family for the specified tax year.
+        /// </summary>
+        /// <remarks>Only families with at least one donation in the specified year are included. The
+        /// first member's address is used as the recipient address for each family.</remarks>
+        /// <param name="year">The tax year for which to generate family tax letters. If null, the current year is used.</param>
+        /// <returns>A view displaying a list of family tax letter view models for the specified year.</returns>
+        public async Task<IActionResult> FamilyTaxLetters(int? year)
+        {
+            int taxYear = year ?? DateTime.Today.Year;
+
+            var families = await _context.Families
+                .Include(f => f.Members)
+                .OrderBy(f => f.FamilyName)
+                .ToListAsync();
+
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Include(d => d.Congregant)
+                .Where(d => d.DonationDate.Year == taxYear && d.CongregantID.HasValue)
+                .ToListAsync();
+
+            var letters = new List<DonorTrackingSystem.ViewModels.FamilyTaxLetterViewModel>();
+
+            // Group donations by family based on congregant membership and create a tax letter for each family with donations in the specified year
+            foreach (var family in families)
+            {
+                var memberIds = family.Members.Select(m => m.ID).ToList();
+                var familyDonations = donations
+                    .Where(d => d.CongregantID.HasValue && memberIds.Contains(d.CongregantID.Value))
+                    .OrderBy(d => d.DonationDate)
+                    .ToList();
+
+                if (!familyDonations.Any()) continue;
+
+                // Use the first member's address for the letter
+                var primaryMember = family.Members.FirstOrDefault();
+
+                // Create a tax letter view model for the family
+                letters.Add(new DonorTrackingSystem.ViewModels.FamilyTaxLetterViewModel
+                {
+                    FamilyName = family.FamilyName,
+                    RecipientName = family.FamilyName,
+                    RecipientAddress = primaryMember?.Address,
+                    MemberNames = family.Members.Select(m => m.Name).ToList(),
+                    Year = taxYear,
+                    Donations = familyDonations.Select(d => new DonorTrackingSystem.ViewModels.TaxLetterDonationLine
+                    {
+                        Date = d.DonationDate,
+                        FundName = d.FundDesignation?.Name ?? "General Fund",
+                        Amount = d.DonationAmount
+                    }).ToList()
+                });
+            }
+
+            ViewBag.Year = taxYear;
+            return View(letters);
+        }
+
+        /// <summary>
+        /// Generates and displays tax letters for all active non-congregant donors for the specified tax year.
+        /// </summary>
+        /// <remarks>Only non-congregant donors with at least one donation in the specified year are
+        /// included. The resulting view can be used to review or print tax letters for these donors.</remarks>
+        /// <param name="year">The tax year for which to generate tax letters. If null, the current year is used.</param>
+        /// <returns>An IActionResult that renders a view containing a list of tax letter view models for non-congregant donors
+        /// with donations in the specified year.</returns>
+        public async Task<IActionResult> NonCongregantTaxLetters(int? year)
+        {
+            int taxYear = year ?? DateTime.Today.Year;
+
+            // Only include active non-congregants in the report
+            var nonCongregants = await _context.NonCongregants
+                .Where(n => n.IsActive)
+                .OrderBy(n => n.LastName).ThenBy(n => n.FirstName).ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+
+            // Get all donations for the specified year that are associated with non-congregants
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.DonationDate.Year == taxYear && d.NonCongregantID.HasValue)
+                .ToListAsync();
+
+            var letters = new List<DonorTrackingSystem.ViewModels.TaxLetterViewModel>();
+
+            // Group donations by non-congregant and create a tax letter for each with donations in the specified year
+            foreach (var nc in nonCongregants)
+            {
+                var ncDonations = donations
+                    .Where(d => d.NonCongregantID == nc.ID)
+                    .OrderBy(d => d.DonationDate)
+                    .ToList();
+
+                if (!ncDonations.Any()) continue;
+
+                // Determine the recipient name based on available information
+                var name = (!string.IsNullOrWhiteSpace(nc.FirstName) || !string.IsNullOrWhiteSpace(nc.LastName))
+                    ? $"{nc.FirstName} {nc.LastName}".Trim()
+                    : nc.CompanyOrganization ?? "Unknown";
+
+                // Create a tax letter view model for the non-congregant donor
+                letters.Add(new DonorTrackingSystem.ViewModels.TaxLetterViewModel
+                {
+                    RecipientName = name,
+                    RecipientAddress = nc.ContactDetails,
+                    Year = taxYear,
+                    Donations = ncDonations.Select(d => new DonorTrackingSystem.ViewModels.TaxLetterDonationLine
+                    {
+                        Date = d.DonationDate,
+                        FundName = d.FundDesignation?.Name ?? "General Fund",
+                        Amount = d.DonationAmount
+                    }).ToList()
+                });
+            }
+
+            ViewBag.Year = taxYear;
+            return View(letters);
+        }
+
+        /// <summary>
+        /// Displays a view for selecting an individual tax letter for a specified year.
+        /// </summary>
+        /// <remarks>The view includes lists of congregants and non-congregants, ordered by name, for the
+        /// specified year.</remarks>
+        /// <param name="year">The tax year to display. If null, the current year is used.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the view for selecting an
+        /// individual tax letter.</returns>
+        public async Task<IActionResult> SelectIndividualTaxLetter(int? year)
+        {
+            int taxYear = year ?? DateTime.Today.Year;
+
+            var congregants = await _context.Congregants
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            var nonCongregants = await _context.NonCongregants
+                .OrderBy(n => n.LastName).ThenBy(n => n.FirstName).ThenBy(n => n.CompanyOrganization)
+                .ToListAsync();
+
+            ViewBag.Year = taxYear;
+            ViewBag.Congregants = congregants;
+            ViewBag.NonCongregants = nonCongregants;
+            return View();
+        }
+
+        /// <summary>
+        /// Generates and returns a tax letter view for an individual congregant for a specified tax year.
+        /// </summary>
+        /// <remarks>The returned view includes all donations made by the congregant during the specified
+        /// year, grouped by fund designation. If no year is provided, the current calendar year is used.</remarks>
+        /// <param name="id">The unique identifier of the congregant for whom the tax letter is generated.</param>
+        /// <param name="year">The tax year for which to generate the letter. If null, the current year is used.</param>
+        /// <returns>An IActionResult that renders the tax letter view for the specified congregant and year. Returns a NotFound
+        /// result if the congregant does not exist.</returns>
+        public async Task<IActionResult> IndividualCongregantTaxLetter(int id, int? year)
+        {
+            int taxYear = year ?? DateTime.Today.Year;
+
+            var congregant = await _context.Congregants.FindAsync(id);
+            if (congregant == null) return NotFound();
+
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.CongregantID == id && d.DonationDate.Year == taxYear)
+                .OrderBy(d => d.DonationDate)
+                .ToListAsync();
+
+            // Create a tax letter view model for the congregant
+            var letter = new DonorTrackingSystem.ViewModels.TaxLetterViewModel
+            {
+                RecipientName = congregant.Name,
+                RecipientAddress = congregant.Address,
+                Year = taxYear,
+                Donations = donations.Select(d => new DonorTrackingSystem.ViewModels.TaxLetterDonationLine
+                {
+                    Date = d.DonationDate,
+                    FundName = d.FundDesignation?.Name ?? "General Fund",
+                    Amount = d.DonationAmount
+                }).ToList()
+            };
+
+            return View("IndividualTaxLetter", letter);
+        }
+
+        /// <summary>
+        /// Generates a tax letter view for an individual non-congregant donor for a specified tax year.
+        /// </summary>
+        /// <remarks>The returned view includes all donations made by the specified non-congregant during
+        /// the given tax year, grouped by fund designation. If the donor's name is not available, the organization name
+        /// or 'Unknown' is used as the recipient.</remarks>
+        /// <param name="id">The unique identifier of the non-congregant donor whose tax letter is to be generated.</param>
+        /// <param name="year">The tax year for which to generate the letter. If null, the current year is used.</param>
+        /// <returns>A view displaying the tax letter for the specified non-congregant and year. Returns a NotFound result if the
+        /// donor does not exist.</returns>
+        public async Task<IActionResult> IndividualNonCongregantTaxLetter(int id, int? year)
+        {
+            int taxYear = year ?? DateTime.Today.Year;
+
+            var nc = await _context.NonCongregants.FindAsync(id);
+            if (nc == null) return NotFound();
+
+            // Get all donations for the specified year associated with this non-congregant donor
+            var donations = await _context.Donations
+                .Include(d => d.FundDesignation)
+                .Where(d => d.NonCongregantID == id && d.DonationDate.Year == taxYear)
+                .OrderBy(d => d.DonationDate)
+                .ToListAsync();
+            // Determine the recipient name based on available information
+            var name = (!string.IsNullOrWhiteSpace(nc.FirstName) || !string.IsNullOrWhiteSpace(nc.LastName))
+                ? $"{nc.FirstName} {nc.LastName}".Trim()
+                : nc.CompanyOrganization ?? "Unknown";
+
+            // Create a tax letter view model for the non-congregant donor
+            var letter = new DonorTrackingSystem.ViewModels.TaxLetterViewModel
+            {
+                RecipientName = name,
+                RecipientAddress = nc.ContactDetails,
+                Year = taxYear,
+                Donations = donations.Select(d => new DonorTrackingSystem.ViewModels.TaxLetterDonationLine
+                {
+                    Date = d.DonationDate,
+                    FundName = d.FundDesignation?.Name ?? "General Fund",
+                    Amount = d.DonationAmount
+                }).ToList()
+            };
+
+            return View("IndividualTaxLetter", letter);
+        }
+
     }
 }

@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Tax Letters";
+    int currentYear = (int)ViewBag.CurrentYear;
+    int priorYear = currentYear - 1;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center">Tax Letters</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        Generate end-of-year tax acknowledgement letters for donors. Each letter prints on its own page and is formatted for mailing.
+    </div>
+
+    <!-- Year selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="bi bi-calendar3"></i> Select Tax Year</h5>
+            <div class="d-flex gap-2">
+                <a asp-action="TaxLetters" class="btn @(true ? "btn-primary" : "btn-outline-secondary")">
+                    @currentYear (Current Year)
+                </a>
+                <a asp-action="TaxLetters" class="btn btn-outline-secondary">
+                    @priorYear (Prior Year)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Letter type cards -->
+    <div class="row">
+        <!-- Family Groups -->
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5><i class="bi bi-house-heart"></i> Family Groups</h5>
+                    <p class="flex-grow-1">
+                        One letter per family. Aggregates all donations from every family member.
+                        Prints each letter on a separate page.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="FamilyTaxLetters" asp-route-year="@currentYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-printer"></i> @currentYear Letters
+                        </a>
+                        <a asp-action="FamilyTaxLetters" asp-route-year="@priorYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-printer"></i> @priorYear Letters
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Non-Congregants -->
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5><i class="bi bi-people"></i> Non-Congregants</h5>
+                    <p class="flex-grow-1">
+                        One letter per non-congregant donor with at least one donation.
+                        Prints each letter on a separate page.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="NonCongregantTaxLetters" asp-route-year="@currentYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-printer"></i> @currentYear Letters
+                        </a>
+                        <a asp-action="NonCongregantTaxLetters" asp-route-year="@priorYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-printer"></i> @priorYear Letters
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual -->
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5><i class="bi bi-person-lines-fill"></i> Individual Donor</h5>
+                    <p class="flex-grow-1">
+                        Generate a single letter for a selected congregant or non-congregant donor.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="SelectIndividualTaxLetter" asp-route-year="@currentYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-search"></i> @currentYear — Select Donor
+                        </a>
+                        <a asp-action="SelectIndividualTaxLetter" asp-route-year="@priorYear" class="btn btn-outline-secondary">
+                            <i class="bi bi-search"></i> @priorYear — Select Donor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>

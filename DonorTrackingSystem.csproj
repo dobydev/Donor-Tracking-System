@@ -7,17 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Admin\**" />
     <Compile Remove="Views\Office Manager\**" />
-    <Content Remove="Views\Admin\**" />
     <Content Remove="Views\Office Manager\**" />
-    <EmbeddedResource Remove="Views\Admin\**" />
     <EmbeddedResource Remove="Views\Office Manager\**" />
-    <None Remove="Views\Admin\**" />
     <None Remove="Views\Office Manager\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Admin\AddFund.cshtml" />
+    <None Include="Views\Admin\EditFund.cshtml" />
+    <None Include="Views\Admin\Index.cshtml" />
+    <None Include="Views\Admin\ManageFunds.cshtml" />
     <None Include="wwwroot\css\Login.css" />
   </ItemGroup>
 

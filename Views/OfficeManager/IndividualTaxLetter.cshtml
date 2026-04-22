@@ -1,0 +1,104 @@
+@model DonorTrackingSystem.ViewModels.TaxLetterViewModel
+@{
+    ViewData["Title"] = $"Tax Letter – {Model.RecipientName} ({Model.Year})";
+}
+
+@await Html.PartialAsync("_TaxLetterStyles")
+
+<!-- Screen controls -->
+<div class="no-print container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Tax Letter — @Model.RecipientName (@Model.Year)</h2>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer"></i> Print Letter
+            </button>
+            <a asp-action="SelectIndividualTaxLetter" asp-route-year="@Model.Year" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Donations.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> No donations recorded for @Model.RecipientName in @Model.Year.
+        </div>
+    }
+</div>
+
+@if (Model.Donations.Any())
+{
+    <div class="letter-page">
+        <div class="letter-church-header">
+            <h4>Grace Community Church</h4>
+            <p>123 Faith Avenue &bull; Springfield, IL 62701</p>
+            <p>Phone: (555) 000-0000 &bull; EIN: 00-0000000</p>
+        </div>
+
+        <p>@(new DateTime(Model.Year, 12, 31) <= DateTime.Today ? new DateTime(Model.Year, 12, 31).ToString("MMMM d, yyyy") : DateTime.Today.ToString("MMMM d, yyyy"))</p>
+
+        <div class="letter-recipient">
+            <strong>@Model.RecipientName</strong><br />
+            @if (!string.IsNullOrWhiteSpace(Model.RecipientAddress))
+            {
+                @Model.RecipientAddress
+            }
+        </div>
+
+        <div class="letter-body">
+            <p>Dear @Model.RecipientName,</p>
+
+            <p>
+                Thank you for your generous contributions to Grace Community Church during the @Model.Year
+                tax year. Your faithful giving makes a meaningful difference in our congregation and community.
+                This letter serves as your official tax-deductible contribution acknowledgement for the
+                @Model.Year calendar year.
+            </p>
+
+            <table class="letter-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Fund</th>
+                        <th class="amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.Donations)
+                    {
+                        <tr>
+                            <td>@d.Date.ToString("MM/dd/yyyy")</td>
+                            <td>@d.FundName</td>
+                            <td class="amount">@d.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                    <tr class="letter-total-row">
+                        <td colspan="2">Total Contributions for @Model.Year</td>
+                        <td class="amount">@Model.Total.ToString("C")</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <strong>No goods or services were provided in exchange for your contributions.</strong>
+                Please retain this letter as your official record for tax purposes.
+            </p>
+
+            <p>
+                We are deeply grateful for your generosity and continued support.
+                May God bless you abundantly for your faithfulness.
+            </p>
+        </div>
+
+        <div class="letter-signature">
+            <p>In His Service,</p>
+            <br />
+            <p>
+                <strong>_________________________________</strong><br />
+                Office Manager<br />
+                Grace Community Church
+            </p>
+        </div>
+    </div>
+}

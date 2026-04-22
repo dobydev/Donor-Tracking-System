@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = $"Select Donor – {ViewBag.Year} Tax Letter";
+    int year = (int)ViewBag.Year;
+    var congregants = ViewBag.Congregants as IEnumerable<DonorTrackingSystem.Models.Congregant> ?? Enumerable.Empty<DonorTrackingSystem.Models.Congregant>();
+    var nonCongregants = ViewBag.NonCongregants as IEnumerable<DonorTrackingSystem.Models.NonCongregant> ?? Enumerable.Empty<DonorTrackingSystem.Models.NonCongregant>();
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Select Donor — @year Tax Letter</h2>
+            <a asp-action="TaxLetters" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+        <div class="col-12"><hr /></div>
+    </div>
+
+    <div class="row">
+        <!-- Congregants -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-people-fill"></i> Congregants</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in congregants)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>
+                                            <a asp-action="IndividualCongregantTaxLetter"
+                                               asp-route-id="@c.ID"
+                                               asp-route-year="@year"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-envelope-paper"></i> Generate
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Non-Congregants -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Non-Congregants</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var nc in nonCongregants)
+                                {
+                                    var name = (!string.IsNullOrWhiteSpace(nc.FirstName) || !string.IsNullOrWhiteSpace(nc.LastName))
+                                        ? $"{nc.FirstName} {nc.LastName}".Trim()
+                                        : nc.CompanyOrganization ?? "Unknown";
+                                    <tr>
+                                        <td>@name</td>
+                                        <td>
+                                            <a asp-action="IndividualNonCongregantTaxLetter"
+                                               asp-route-id="@nc.ID"
+                                               asp-route-year="@year"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-envelope-paper"></i> Generate
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -109,11 +109,7 @@
 }
 
 .btn-admin {
-    background: #000080;
-}
-
-.btn-admin:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: #004080;
 }
 
 .btn-manager {

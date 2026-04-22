@@ -1,0 +1,100 @@
+@section Styles {
+<style>
+    .letter-page {
+        max-width: 720px;
+        margin: 0 auto 60px auto;
+        padding: 48px 56px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 15px;
+        color: #212529;
+    }
+
+    .letter-church-header {
+        text-align: center;
+        margin-bottom: 28px;
+        border-bottom: 2px solid #212529;
+        padding-bottom: 16px;
+    }
+
+    .letter-church-header h4 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .letter-church-header p {
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .letter-recipient {
+        margin-bottom: 24px;
+    }
+
+    .letter-body p {
+        margin-bottom: 14px;
+        line-height: 1.7;
+    }
+
+    .letter-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+
+    .letter-table th {
+        border-bottom: 2px solid #212529;
+        padding: 6px 8px;
+        text-align: left;
+    }
+
+    .letter-table td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .letter-table .amount {
+        text-align: right;
+    }
+
+    .letter-total-row td {
+        border-top: 2px solid #212529;
+        border-bottom: none;
+        font-weight: 700;
+        padding-top: 8px;
+    }
+
+    .letter-signature {
+        margin-top: 40px;
+    }
+
+    .no-print {
+        max-width: 720px;
+        margin: 0 auto 16px auto;
+    }
+
+    /* Print styles */
+    @@media print {
+        body, html { background: #fff !important; }
+
+        header, footer, .no-print { display: none !important; }
+
+        .letter-page {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0.5in 0.75in !important;
+            page-break-after: always;
+        }
+
+        .letter-page:last-child {
+            page-break-after: avoid;
+        }
+    }
+</style>
+}
