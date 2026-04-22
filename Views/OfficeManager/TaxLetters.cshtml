@@ -17,21 +17,6 @@
         Generate end-of-year tax acknowledgement letters for donors. Each letter prints on its own page and is formatted for mailing.
     </div>
 
-    <!-- Year selector -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="mb-3"><i class="bi bi-calendar3"></i> Select Tax Year</h5>
-            <div class="d-flex gap-2">
-                <a asp-action="TaxLetters" class="btn @(true ? "btn-primary" : "btn-outline-secondary")">
-                    @currentYear (Current Year)
-                </a>
-                <a asp-action="TaxLetters" class="btn btn-outline-secondary">
-                    @priorYear (Prior Year)
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- Letter type cards -->
     <div class="row">
         <!-- Family Groups -->
