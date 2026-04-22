@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DonorTrackingSystem.Controllers
 {
-    [Authorize(Roles = "Office Manager")]
+    [Authorize(Roles = "Office Manager, Administrator")]
     public class OfficeManagerController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -49,7 +49,7 @@ namespace DonorTrackingSystem.Data
             context.Congregants.AddRange(congregants);
             await context.SaveChangesAsync();
 
-            // Non-Congregants (30) 
+            // Non-Congregants (20) 
             var nonCongregants = new List<NonCongregant>
             {
                 new NonCongregant { FirstName = "Alan",    LastName = "Foster",     ContactDetails = "alan.foster@mail.com | 555-301-0001",         IsActive = true  },
@@ -62,16 +62,6 @@ namespace DonorTrackingSystem.Data
                 new NonCongregant { FirstName = "Hannah",  LastName = "Howard",     ContactDetails = "hhoward@mail.com | 555-301-0008",              IsActive = true  },
                 new NonCongregant { FirstName = "Ian",     LastName = "Ward",       ContactDetails = "iward@mail.com | 555-301-0009",                IsActive = true  },
                 new NonCongregant { FirstName = "Julia",   LastName = "Torres",     ContactDetails = "jtorres@mail.com | 555-301-0010",              IsActive = true  },
-                new NonCongregant { FirstName = "Kevin",   LastName = "Peterson",   ContactDetails = "kpeterson@mail.com | 555-302-0001",            IsActive = true  },
-                new NonCongregant { FirstName = "Laura",   LastName = "Gray",       ContactDetails = "lgray@mail.com | 555-302-0002",                IsActive = true  },
-                new NonCongregant { FirstName = "Mark",    LastName = "Ramirez",    ContactDetails = "mramirez@mail.com | 555-302-0003",             IsActive = true  },
-                new NonCongregant { FirstName = "Nina",    LastName = "James",      ContactDetails = "njames@mail.com | 555-302-0004",               IsActive = true  },
-                new NonCongregant { FirstName = "Oscar",   LastName = "Watson",     ContactDetails = "owatson@mail.com | 555-302-0005",              IsActive = true  },
-                new NonCongregant { FirstName = "Paula",   LastName = "Brooks",     ContactDetails = "pbrooks@mail.com | 555-302-0006",              IsActive = true  },
-                new NonCongregant { FirstName = "Quinn",   LastName = "Kelly",      ContactDetails = "qkelly@mail.com | 555-302-0007",               IsActive = true  },
-                new NonCongregant { FirstName = "Rachel",  LastName = "Sanders",    ContactDetails = "rsanders@mail.com | 555-302-0008",             IsActive = true  },
-                new NonCongregant { FirstName = "Samuel",  LastName = "Price",      ContactDetails = "sprice@mail.com | 555-302-0009",               IsActive = true  },
-                new NonCongregant { FirstName = "Tina",    LastName = "Bennett",    ContactDetails = "tbennett@mail.com | 555-302-0010",             IsActive = true  },
                 new NonCongregant { FirstName = "Ulrich",  LastName = "Wood",       ContactDetails = "uwood@mail.com | 555-303-0001",                IsActive = true  },
                 new NonCongregant { FirstName = "Vera",    LastName = "Barnes",     ContactDetails = "vbarnes@mail.com | 555-303-0002",              IsActive = true  },
                 new NonCongregant { FirstName = "Walter",  LastName = "Ross",       ContactDetails = "wross@mail.com | 555-303-0003",                IsActive = false },
@@ -164,11 +154,11 @@ namespace DonorTrackingSystem.Data
                 (14, 50m,   3,  currentYear),
                 (15, 2000m, 4,  currentYear),
                 (15, 1800m, 9,  priorYear),
-                (26, 5000m, 1,  currentYear),
-                (26, 4500m, 6,  priorYear),
-                (27, 3000m, 3,  currentYear),
-                (27, 2800m, 9,  priorYear),
-                (28, 1500m, 5,  currentYear),
+                (16, 5000m, 1,  currentYear),
+                (16, 4500m, 6,  priorYear),
+                (17, 3000m, 3,  currentYear),
+                (17, 2800m, 9,  priorYear),
+                (18, 1500m, 5,  currentYear),
             };
 
             // For non-congregants, we will assign DonorIDs starting from 2000 + idx to avoid overlap with congregant DonorIDs

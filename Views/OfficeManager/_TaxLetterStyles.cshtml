@@ -1,100 +1,154 @@
 @section Styles {
-<style>
-    .letter-page {
-        max-width: 720px;
-        margin: 0 auto 60px auto;
-        padding: 48px 56px;
-        background: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        font-family: "Times New Roman", Times, serif;
-        font-size: 15px;
-        color: #212529;
-    }
-
-    .letter-church-header {
-        text-align: center;
-        margin-bottom: 28px;
-        border-bottom: 2px solid #212529;
-        padding-bottom: 16px;
-    }
-
-    .letter-church-header h4 {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 2px;
-    }
-
-    .letter-church-header p {
-        margin: 0;
-        font-size: 13px;
-    }
-
-    .letter-recipient {
-        margin-bottom: 24px;
-    }
-
-    .letter-body p {
-        margin-bottom: 14px;
-        line-height: 1.7;
-    }
-
-    .letter-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 16px;
-        font-size: 14px;
-    }
-
-    .letter-table th {
-        border-bottom: 2px solid #212529;
-        padding: 6px 8px;
-        text-align: left;
-    }
-
-    .letter-table td {
-        padding: 5px 8px;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .letter-table .amount {
-        text-align: right;
-    }
-
-    .letter-total-row td {
-        border-top: 2px solid #212529;
-        border-bottom: none;
-        font-weight: 700;
-        padding-top: 8px;
-    }
-
-    .letter-signature {
-        margin-top: 40px;
-    }
-
-    .no-print {
-        max-width: 720px;
-        margin: 0 auto 16px auto;
-    }
-
-    /* Print styles */
-    @@media print {
-        body, html { background: #fff !important; }
-
-        header, footer, .no-print { display: none !important; }
-
+    <style>
+        /* ── Page Container ───────────────────────────── */
         .letter-page {
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 0.5in 0.75in !important;
-            page-break-after: always;
+            max-width: 760px;
+            margin: 0 auto 60px;
+            padding: 48px 64px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #212529;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
-        .letter-page:last-child {
-            page-break-after: avoid;
+        .pdf-page-break {
+            height: 0;
+            page-break-after: always;
+            break-after: page;
         }
-    }
-</style>
+
+        /* ── Church Header ────────────────────────────── */
+        .letter-church-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .letter-logo {
+            width: 120px;
+            display: block;
+            margin: 0 auto 8px;
+        }
+
+        .letter-church-header h1 {
+            margin: 6px 0 2px;
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .letter-church-header p {
+            margin: 0;
+            font-size: 12px;
+            color: #444;
+        }
+
+        /* ── Sections ─────────────────────────────────── */
+        .letter-section {
+            margin-top: 25px;
+        }
+
+            .letter-section h2 {
+                margin-bottom: 0;
+                padding-bottom: 4px;
+                font-size: 13px;
+                font-weight: bold;
+                border-bottom: 1px solid #333;
+            }
+
+        /* ── Recipient ────────────────────────────────── */
+        .letter-recipient {
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        /* ── Body Text ────────────────────────────────── */
+        .letter-body p {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        /* ── Table ────────────────────────────────────── */
+        .letter-table {
+            width: 100%;
+            margin: 10px 0 16px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+            .letter-table th,
+            .letter-table td {
+                padding: 6px;
+                text-align: left;
+            }
+
+            .letter-table th {
+                font-weight: bold;
+                border-bottom: 1px solid #333;
+            }
+
+            .letter-table td {
+                border-bottom: 1px solid #ddd;
+                vertical-align: top;
+            }
+
+            .letter-table .amount {
+                text-align: right;
+            }
+
+        .letter-total-row td {
+            padding-top: 8px;
+            font-weight: bold;
+            border-top: 1px solid #333;
+            border-bottom: none;
+        }
+
+        /* ── Signature ────────────────────────────────── */
+        .letter-signature {
+            margin-top: 40px;
+            line-height: 1.8;
+        }
+
+        /* ── Screen Controls ──────────────────────────── */
+        .no-print {
+            max-width: 760px;
+            margin: 0 auto 16px;
+        }
+
+        /* ── Print Styles ─────────────────────────────── */
+        @@media print {
+            body,
+            html {
+                background: #fff !important;
+            }
+
+            header,
+            footer,
+            .no-print {
+                display: none !important;
+            }
+
+            .letter-page {
+                margin: 0 !important;
+                padding: 0.5in 0.75in !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            .pdf-page-break {
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+
+            .letter-page {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
 }

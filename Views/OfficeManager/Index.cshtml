@@ -23,9 +23,9 @@
     }
 
     <!-- Quick action buttons -->
-    <div class="row mb-4 d-flex justify-content-between">
+    <div class="row mb-4">
         <!-- Manage congregants card -->
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Congregants</h5>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <!-- Manage families card -->
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Family Groups</h5>
@@ -49,7 +49,7 @@
             </div>
         </div>
         <!-- Manage non-congregants card -->
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Non-Congregants</h5>
@@ -60,7 +60,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <!-- Reports -->
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Reports</h5>
@@ -71,19 +72,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5>Tax Letters</h5>
-                    <p>Generate donor acknowledgement letters</p>
-                    <a asp-action="TaxLetters" class="btn btn-outline-secondary">
-                        <i class="bi bi-envelope-paper"></i> Generate
-                    </a>
-                </div>
-            </div>
-        </div>
         <!-- Support Staff Dashboard -->
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Support Staff Dashboard</h5>
@@ -94,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Congregant Donation History</h5>
@@ -105,13 +95,24 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-3 col-md-6 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
                     <h5>Non-Congregant Donation History</h5>
                     <p>View non-congregant giving patterns</p>
                     <a asp-action="ViewNonCongregantDonationHistory" class="btn btn-outline-secondary">
                         <i class="bi bi-clock-history"></i> View History
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5>Tax Letters</h5>
+                    <p>Generate donor acknowledgement letters</p>
+                    <a asp-action="TaxLetters" class="btn btn-outline-secondary">
+                        <i class="bi bi-envelope-paper"></i> Generate
                     </a>
                 </div>
             </div>

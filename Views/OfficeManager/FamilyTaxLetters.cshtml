@@ -1,18 +1,94 @@
 @model IEnumerable<DonorTrackingSystem.ViewModels.FamilyTaxLetterViewModel>
+
 @{
     ViewData["Title"] = $"Family Tax Letters – {ViewBag.Year}";
     int year = (int)ViewBag.Year;
 }
 
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Sync checkbox states with letter visibility
+        function syncVisibility() {
+        document.querySelectorAll('.letter-checkbox').forEach(cb => {
+        const page = document.querySelector(`#letters-export .letter-page[data-key="${cb.value}"]`);
+        if (page) {
+        page.style.display = cb.checked ? '' : 'none';
+        }
+        });
+        }
+
+        // Update export button state and text based on selections
+        function updateExportBtn() {
+        const checked = document.querySelectorAll('.letter-checkbox:checked').length;
+        const btn = document.getElementById('btn-export-pdf');
+
+        btn.disabled = checked === 0;
+        btn.innerHTML = checked === 0
+        ? '<i class="bi bi-file-earmark-pdf"></i> Export PDF'
+        : `<i class="bi bi-file-earmark-pdf"></i> Export Selected (${checked}) as PDF`;
+        }
+
+        // Select all checkboxes and update UI
+        function selectAll() {
+        document.querySelectorAll('.letter-checkbox').forEach(cb => cb.checked = true);
+        syncVisibility();
+        updateExportBtn();
+        }
+
+        // Deselect all checkboxes and update UI
+        function deselectAll() {
+        document.querySelectorAll('.letter-checkbox').forEach(cb => cb.checked = false);
+        syncVisibility();
+        updateExportBtn();
+        }
+
+        // Export selected letters to PDF
+        function exportPdf() {
+        const btn = document.getElementById('btn-export-pdf');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generating…';
+
+        const options = {
+        margin: [0.5, 0.6],
+        filename: 'FamilyTaxLetters_@(year).pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        html2pdf()
+        .set(options)
+        .from(document.getElementById('letters-export'))
+        .save()
+        .then(() => {
+        updateExportBtn();
+        });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.letter-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+        syncVisibility();
+        updateExportBtn();
+        });
+        });
+
+        syncVisibility();
+        updateExportBtn();
+        });
+    </script>
+}
+
 @await Html.PartialAsync("_TaxLetterStyles")
 
-<!-- Screen controls -->
 <div class="no-print container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Family Tax Letters – @year</h2>
+        <h3>Family Tax Letters – @year</h3>
         <div class="d-flex gap-2">
-            <button onclick="window.print()" class="btn btn-primary">
-                <i class="bi bi-printer"></i> Print All Letters
+            <button id="btn-export-pdf" onclick="exportPdf()" class="btn btn-primary" disabled>
+                <i class="bi bi-file-earmark-pdf"></i> Export PDF
             </button>
             <a asp-action="TaxLetters" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back
@@ -29,97 +105,149 @@
     else
     {
         <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> @Model.Count() letter(s) ready. Use <strong>Print All Letters</strong> to send to your printer — each letter prints on its own page.
+            <i class="bi bi-info-circle"></i> Select the families below, then click <strong>Export Selected as PDF</strong>.
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Select Families to Include</span>
+                <div class="d-flex gap-2">
+                    <button type="button" onclick="selectAll()" class="btn btn-sm btn-outline-primary">Select All</button>
+                    <button type="button" onclick="deselectAll()" class="btn btn-sm btn-outline-secondary">Deselect All</button>
+                </div>
+            </div>
+
+            <div class="card-body" style="max-height: 260px; overflow-y: auto;">
+                <div class="row">
+                    @{
+                        int fi = 0;
+                    }
+
+                    @foreach (var letter in Model)
+                    {
+                        <div class="col-md-4 col-sm-6 mb-1">
+                            <div class="form-check">
+                                <input class="form-check-input letter-checkbox"
+                                       type="checkbox"
+                                       id="chk-family-@fi"
+                                       value="@fi"
+                                       checked />
+                                <label class="form-check-label" for="chk-family-@fi">
+                                    The @letter.FamilyName Family
+                                    <small class="text-muted">(@letter.Total.ToString("C"))</small>
+                                </label>
+                            </div>
+                        </div>
+                        fi++;
+                    }
+                </div>
+            </div>
         </div>
     }
 </div>
 
-<!-- Letters -->
-@foreach (var letter in Model)
-{
-    <div class="letter-page">
-        <!-- Church header -->
-        <div class="letter-church-header">
-            <h4>Grace Community Church</h4>
-            <p>123 Faith Avenue &bull; Springfield, IL 62701</p>
-            <p>Phone: (555) 000-0000 &bull; EIN: 00-0000000</p>
-        </div>
+<div id="letters-export">
+    @{
+        int li = 0;
+        int totalLetters = Model.Count();
+    }
 
-        <!-- Date -->
-        <p>@(new DateTime(year, 12, 31) <= DateTime.Today ? new DateTime(year, 12, 31).ToString("MMMM d, yyyy") : DateTime.Today.ToString("MMMM d, yyyy"))</p>
-
-        <!-- Recipient address block -->
-        <div class="letter-recipient">
-            <strong>The @letter.FamilyName</strong><br />
-            @if (!string.IsNullOrWhiteSpace(letter.RecipientAddress))
-            {
-                @letter.RecipientAddress
-            }
-        </div>
-
-        <!-- Salutation & body -->
-        <div class="letter-body">
-            <p>Dear @letter.FamilyName,</p>
-
-            <p>
-                Thank you for your generous contributions to Grace Community Church during the @year tax year.
-                Your faithful giving makes a meaningful difference in our congregation and community.
-                This letter serves as your official tax-deductible contribution acknowledgement for the
-                @year calendar year.
-            </p>
-
-            @if (letter.MemberNames.Count > 1)
-            {
+    @foreach (var letter in Model)
+    {
+        <div class="letter-page" data-key="@li">
+            <div class="letter-church-header">
+                <h3 class="mt-3"><strong>Grace Community Church</strong></h3>
+                <address>
+                    123 Faith Avenue<br />
+                    Springfield, IL 62701<br />
+                    Phone: (555) 000-0000<br />
+                    EIN: 00-0000000
+                </address>
                 <p>
-                    <strong>Donations included for:</strong> @string.Join(", ", letter.MemberNames)
+                    @(new DateTime(year, 12, 31) <= DateTime.Today
+                        ? new DateTime(year, 12, 31).ToString("MMMM d, yyyy")
+                        : DateTime.Today.ToString("MMMM d, yyyy"))
                 </p>
-            }
+            </div>
 
-            <!-- Donation table -->
-            <table class="letter-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Fund</th>
-                        <th class="amount">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var d in letter.Donations)
-                    {
-                        <tr>
-                            <td>@d.Date.ToString("MM/dd/yyyy")</td>
-                            <td>@d.FundName</td>
-                            <td class="amount">@d.Amount.ToString("C")</td>
-                        </tr>
-                    }
-                    <tr class="letter-total-row">
-                        <td colspan="2">Total Contributions for @year</td>
-                        <td class="amount">@letter.Total.ToString("C")</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="letter-recipient">
+                <strong>The @letter.FamilyName</strong><br />
+                @if (!string.IsNullOrWhiteSpace(letter.RecipientAddress))
+                {
+                    @letter.RecipientAddress
+                }
+            </div>
 
-            <p>
-                <strong>No goods or services were provided in exchange for your contributions.</strong>
-                Please retain this letter as your official record for tax purposes.
-            </p>
-
-            <p>
-                We are deeply grateful for your generosity and continued support.
-                May God bless you abundantly for your faithfulness.
-            </p>
-        </div>
-
-        <!-- Signature -->
-        <div class="letter-signature">
-            <p>In His Service,</p>
+            <strong>_________________________________________________</strong><br />
             <br />
-            <p>
-                <strong>_________________________________</strong><br />
-                Office Manager<br />
-                Grace Community Church
-            </p>
+
+            <div class="letter-body">
+                <p>Dear @letter.FamilyName,</p>
+
+                <p>
+                    Thank you for your generous support of Grace Community Church during the @year tax year.
+                    This letter serves as your official tax-deductible contribution acknowledgement for the
+                    @year calendar year.
+                </p>
+
+                @if (letter.MemberNames.Count > 1)
+                {
+                    <p>
+                        <strong>Donations included for:</strong> @string.Join(", ", letter.MemberNames)
+                    </p>
+                }
+
+                <strong>_________________________________________________</strong><br />
+                <br />
+
+                <table class="letter-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Fund</th>
+                            <th class="amount">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in letter.Donations)
+                        {
+                            <tr>
+                                <td>@d.Date.ToString("MM/dd/yyyy")</td>
+                                <td>@d.FundName</td>
+                                <td class="amount">@d.Amount.ToString("C")</td>
+                            </tr>
+                        }
+                        <tr class="letter-total-row">
+                            <td colspan="2"><strong>Total Contributions for @year:</strong></td>
+                            <td class="amount">@letter.Total.ToString("C")</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <strong>_________________________________________________</strong><br />
+                <br />
+
+                <p><strong>No goods or services were provided in exchange for your contributions.</strong></p>
+                <p>Please retain this letter as your official record for tax purposes.</p>
+            </div>
+
+            <div class="letter-signature">
+                <div class="d-flex justify-content-start">
+                    <p class="mb-0">
+                        <strong>_________________________________</strong><br />
+                        <strong>Office Manager</strong> |
+                        Grace Community Church
+                    </p>
+                    <img src="~/Donor_Logo_2.png" alt="Church Logo" style="width: 150px;" />
+                </div>
+            </div>
         </div>
-    </div>
-}
+
+        @if (li < totalLetters - 1)
+        {
+            <div class="pdf-page-break"></div>
+        }
+
+        li++;
+    }
+</div>

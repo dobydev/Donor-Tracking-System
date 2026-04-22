@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DonorTrackingSystem.Controllers
 {
     // This controller is responsible for handling all actions related to support staff functionalities, such as recording donations, managing congregants and non-congregant donors, and generating reports. Access to this controller is restricted to users with the "Support Staff" role.
-    [Authorize(Roles = "Support Staff, Office Manager")]
+    [Authorize(Roles = "Support Staff, Office Manager, Administrator")]
     public class SupportStaffController : Controller
     {
         private readonly ApplicationDbContext _context;
