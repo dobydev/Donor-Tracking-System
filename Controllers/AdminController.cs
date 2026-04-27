@@ -1,6 +1,7 @@
 using DonorTrackingSystem.Models;
 using DonorTrackingSystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +10,21 @@ namespace DonorTrackingSystem.Controllers
     [Authorize(Roles = "Administrator")]
     public class AdminController : Controller
     {
+        // Dependencies for database access and user/role management
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(ApplicationDbContext context)
+        // Define staff roles as a constant array for easy maintenance and validation
+        private static readonly string[] StaffRoles = { "Administrator", "Office Manager", "Support Staff" };
+
+        public AdminController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -150,7 +161,7 @@ namespace DonorTrackingSystem.Controllers
             return RedirectToAction(nameof(ManageFunds));
         }
 
-        // ── Merge Congregants ─────────────────────────────────────────────────
+        // ── Merge Congregants 
 
         /// <summary>
         /// Displays the merge congregant records page.
@@ -204,7 +215,7 @@ namespace DonorTrackingSystem.Controllers
             return RedirectToAction(nameof(MergeCongregants));
         }
 
-        // ── Merge Non-Congregants ─────────────────────────────────────────────
+        // ── Merge Non-Congregants
 
         /// <summary>
         /// Displays the merge non-congregant records page.
@@ -275,6 +286,186 @@ namespace DonorTrackingSystem.Controllers
 
             TempData["SuccessMessage"] = $"Merged '{sourceName}' into '{targetName}'. {donations.Count} donation(s) transferred. No data was lost.";
             return RedirectToAction(nameof(MergeNonCongregants));
+        }
+
+        // ── Staff Management ──────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lists all staff accounts with their assigned roles and active status.
+        /// </summary>
+        public async Task<IActionResult> ManageStaff()
+        {
+            var users = _userManager.Users.ToList();
+            var staff = new List<StaffListViewModel>();
+
+            foreach (var user in users.OrderBy(u => u.UserName))
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                staff.Add(new StaffListViewModel
+                {
+                    Id       = user.Id,
+                    StaffId  = user.UserName ?? string.Empty,
+                    Role     = roles.FirstOrDefault() ?? "No Role",
+                    IsActive = user.IsActive
+                });
+            }
+
+            return View(staff);
+        }
+
+        /// <summary>
+        /// Returns the form for adding a new staff account.
+        /// </summary>
+        public IActionResult AddStaff()
+        {
+            ViewBag.Roles = StaffRoles;
+            return View(new AddStaffViewModel());
+        }
+
+        /// <summary>
+        /// Handles POST to create a new staff account with the specified role.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddStaff(AddStaffViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            // Staff ID must be unique
+            if (await _userManager.FindByNameAsync(vm.StaffId) != null)
+            {
+                ModelState.AddModelError(nameof(vm.StaffId), "A staff account with this ID already exists.");
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            if (!StaffRoles.Contains(vm.Role))
+            {
+                ModelState.AddModelError(nameof(vm.Role), "Invalid role selected.");
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            var user = new ApplicationUser { UserName = vm.StaffId, IsActive = true };
+            var result = await _userManager.CreateAsync(user, vm.Password);
+
+            if (!result.Succeeded)
+            {
+                foreach (var e in result.Errors)
+                    ModelState.AddModelError(string.Empty, e.Description);
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            await _userManager.AddToRoleAsync(user, vm.Role);
+
+            TempData["SuccessMessage"] = $"Staff account '{vm.StaffId}' created successfully with the '{vm.Role}' role.";
+            return RedirectToAction(nameof(ManageStaff));
+        }
+
+        /// <summary>
+        /// Returns the edit form for an existing staff account.
+        /// </summary>
+        public async Task<IActionResult> EditStaff(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(user);
+            ViewBag.Roles = StaffRoles;
+
+            return View(new EditStaffViewModel
+            {
+                Id       = user.Id,
+                StaffId  = user.UserName ?? string.Empty,
+                Role     = roles.FirstOrDefault() ?? string.Empty,
+                IsActive = user.IsActive
+            });
+        }
+
+        /// <summary>
+        /// Handles POST to update role, active status, and optionally reset the password.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditStaff(EditStaffViewModel vm)
+        {
+            // Remove NewPassword validation error if left blank (it's optional)
+            if (string.IsNullOrWhiteSpace(vm.NewPassword))
+                ModelState.Remove(nameof(vm.NewPassword));
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            var user = await _userManager.FindByIdAsync(vm.Id);
+            if (user == null) return NotFound();
+
+            if (!StaffRoles.Contains(vm.Role))
+            {
+                ModelState.AddModelError(nameof(vm.Role), "Invalid role selected.");
+                ViewBag.Roles = StaffRoles;
+                return View(vm);
+            }
+
+            // Update active status
+            user.IsActive = vm.IsActive;
+            await _userManager.UpdateAsync(user);
+
+            // Update role: remove existing, assign new
+            var existingRoles = await _userManager.GetRolesAsync(user);
+            if (existingRoles.Any())
+                await _userManager.RemoveFromRolesAsync(user, existingRoles);
+            await _userManager.AddToRoleAsync(user, vm.Role);
+
+            // Reset password if provided
+            if (!string.IsNullOrWhiteSpace(vm.NewPassword))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var pwResult = await _userManager.ResetPasswordAsync(user, token, vm.NewPassword);
+                if (!pwResult.Succeeded)
+                {
+                    foreach (var e in pwResult.Errors)
+                        ModelState.AddModelError(string.Empty, e.Description);
+                    ViewBag.Roles = StaffRoles;
+                    return View(vm);
+                }
+            }
+
+            TempData["SuccessMessage"] = $"Staff account '{user.UserName}' updated successfully.";
+            return RedirectToAction(nameof(ManageStaff));
+        }
+
+        /// <summary>
+        /// Handles POST to permanently delete a staff account.
+        /// Prevents deleting the currently logged-in administrator.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteStaff(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            // Prevent self-deletion
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.Id == id)
+            {
+                TempData["ErrorMessage"] = "You cannot delete your own account.";
+                return RedirectToAction(nameof(ManageStaff));
+            }
+
+            var staffId = user.UserName;
+            await _userManager.DeleteAsync(user);
+
+            TempData["SuccessMessage"] = $"Staff account '{staffId}' has been deleted.";
+            return RedirectToAction(nameof(ManageStaff));
         }
     }
 }

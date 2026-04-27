@@ -1,0 +1,73 @@
+@model DonorTrackingSystem.ViewModels.EditStaffViewModel
+@{
+    ViewData["Title"] = "Edit Staff Account";
+    var roles = ViewBag.Roles as string[] ?? Array.Empty<string>();
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Edit Staff Account — @Model.StaffId</h2>
+            <a asp-action="ManageStaff" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+        <div class="col-12"><hr /></div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="EditStaff" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="StaffId" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:@(ViewContext.ModelState.IsValid ? "none" : "block")"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Staff ID</label>
+                            <input class="form-control" value="@Model.StaffId" disabled />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label fw-bold"></label>
+                            <select asp-for="Role" class="form-select">
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role" selected="@(Model.Role == role)">@role</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Account Status</label>
+                            <div class="form-check form-switch mt-1">
+                                <input class="form-check-input" type="checkbox" asp-for="IsActive" id="isActiveSwitch" />
+                                <label class="form-check-label" for="isActiveSwitch">
+                                    Active <span class="text-muted small">(uncheck to deactivate)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="NewPassword" class="form-label fw-bold"></label>
+                            <input asp-for="NewPassword" class="form-control" placeholder="Leave blank to keep current password" />
+                            <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                            <div class="form-text">Minimum 6 characters. Leave blank to keep the current password.</div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                            <a asp-action="ManageStaff" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

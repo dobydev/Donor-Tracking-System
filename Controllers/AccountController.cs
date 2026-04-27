@@ -53,6 +53,15 @@ namespace DonorTrackingSystem.Controllers
                 // If sign-in is successful, redirect to home page
                 if (result.Succeeded)
                 {
+                    // Block deactivated accounts immediately after sign-in
+                    var user = await userManager.FindByNameAsync(vm.ID.ToString());
+                    if (user != null && !user.IsActive)
+                    {
+                        await signInManager.SignOutAsync();
+                        ModelState.AddModelError("", "This account has been deactivated. Please contact an administrator.");
+                        return View(vm);
+                    }
+
                     return RedirectToAction("Index", "Home");
                 }
                 // If sign-in fails, add specific and user-friendly error message
