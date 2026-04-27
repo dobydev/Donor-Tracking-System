@@ -1,0 +1,124 @@
+@model DonorTrackingSystem.ViewModels.MergeCongregantViewModel
+@{
+    ViewData["Title"] = "Merge Congregant Records";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Merge Congregant Records</h2>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+        <div class="col-12"><hr /></div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong>Warning:</strong> The <strong>Source</strong> record will be permanently deleted after all of its donation history is transferred to the <strong>Target</strong> record. This action cannot be undone.
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-people-fill"></i> Select Records to Merge
+        </div>
+        <div class="card-body">
+            <form asp-action="MergeCongregants" method="post">
+                @Html.AntiForgeryToken()
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <label asp-for="SourceId" class="form-label fw-bold">
+                            Source <small class="text-muted fw-normal">(duplicate — will be deleted)</small>
+                        </label>
+                        <select asp-for="SourceId" class="form-select" id="sourceSelect">
+                            <option value="">-- Select Source Record --</option>
+                            @foreach (var c in Model.Congregants)
+                            {
+                                <option value="@c.ID">@c.Name — @c.ActiveStatus.ToString()</option>
+                            }
+                        </select>
+                        <span asp-validation-for="SourceId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end justify-content-center pb-1">
+                        <i class="bi bi-arrow-right fs-3 text-muted"></i>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label asp-for="TargetId" class="form-label fw-bold">
+                            Target <small class="text-muted fw-normal">(record to keep)</small>
+                        </label>
+                        <select asp-for="TargetId" class="form-select" id="targetSelect">
+                            <option value="">-- Select Target Record --</option>
+                            @foreach (var c in Model.Congregants)
+                            {
+                                <option value="@c.ID">@c.Name — @c.ActiveStatus.ToString()</option>
+                            }
+                        </select>
+                        <span asp-validation-for="TargetId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Preview panel -->
+                <div id="merge-preview" class="mt-4" style="display:none;">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        All donations from <strong id="preview-source"></strong> will be moved to <strong id="preview-target"></strong>, then <strong id="preview-source2"></strong> will be permanently deleted.
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-danger" id="btn-merge" disabled>
+                        <i class="bi bi-union"></i> Merge Records
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const sourceSelect = document.getElementById('sourceSelect');
+    const targetSelect = document.getElementById('targetSelect');
+    const btnMerge = document.getElementById('btn-merge');
+    const preview = document.getElementById('merge-preview');
+
+    function updatePreview() {
+        const srcId = sourceSelect.value;
+        const tgtId = targetSelect.value;
+        const srcText = sourceSelect.options[sourceSelect.selectedIndex]?.text;
+        const tgtText = targetSelect.options[targetSelect.selectedIndex]?.text;
+        const valid = srcId && tgtId && srcId !== tgtId;
+
+        btnMerge.disabled = !valid;
+        preview.style.display = valid ? '' : 'none';
+
+        if (valid) {
+            document.getElementById('preview-source').textContent = srcText;
+            document.getElementById('preview-source2').textContent = srcText;
+            document.getElementById('preview-target').textContent = tgtText;
+        }
+    }
+
+    sourceSelect.addEventListener('change', updatePreview);
+    targetSelect.addEventListener('change', updatePreview);
+</script>
+}
