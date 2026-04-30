@@ -457,8 +457,9 @@ namespace DonorTrackingSystem.Controllers
         /// </summary>
         /// <param name="id">The ID of the donation to edit.</param>
         /// <param name="congregantId">The ID of the congregant to return to after editing.</param>
+        /// <param name="nonCongregantId">The ID of the non-congregant to return to after editing.</param>
         /// <returns>A view with the donation's current information for editing, or NotFound if the donation doesn't exist.</returns>
-        public async Task<IActionResult> EditDonation(int? id, int? congregantId)
+        public async Task<IActionResult> EditDonation(int? id, int? congregantId, int? nonCongregantId)
         {
             if (id == null)
             {
@@ -468,6 +469,7 @@ namespace DonorTrackingSystem.Controllers
             var donation = await _context.Donations
                 .Include(d => d.FundDesignation)
                 .Include(d => d.Congregant)
+                .Include(d => d.NonCongregant)
                 .FirstOrDefaultAsync(d => d.ID == id);
 
             if (donation == null)
@@ -483,9 +485,29 @@ namespace DonorTrackingSystem.Controllers
                 donation.FundDesignationID
             );
 
-            // Store congregant ID for return navigation
+            // Store IDs for return navigation
             ViewBag.CongregantID = congregantId ?? donation.CongregantID;
-            ViewBag.CongregantName = donation.Congregant?.Name ?? "Unknown";
+            ViewBag.NonCongregantID = nonCongregantId ?? donation.NonCongregantID;
+
+            // Determine display name
+            if (donation.Congregant != null)
+            {
+                ViewBag.DonorName = donation.Congregant.Name;
+                ViewBag.IsCongregant = true;
+            }
+            else if (donation.NonCongregant != null)
+            {
+                var nc = donation.NonCongregant;
+                ViewBag.DonorName = (!string.IsNullOrWhiteSpace(nc.FirstName) || !string.IsNullOrWhiteSpace(nc.LastName))
+                    ? $"{nc.FirstName} {nc.LastName}".Trim()
+                    : nc.CompanyOrganization ?? "Unknown";
+                ViewBag.IsCongregant = false;
+            }
+            else
+            {
+                ViewBag.DonorName = "Unknown";
+                ViewBag.IsCongregant = true;
+            }
 
             return View(donation);
         }
@@ -496,10 +518,11 @@ namespace DonorTrackingSystem.Controllers
         /// <param name="id">The ID of the donation to update.</param>
         /// <param name="donation">The updated donation information.</param>
         /// <param name="congregantId">The ID of the congregant to return to after editing.</param>
-        /// <returns>A redirect to the congregant's donation history if the update is successful; otherwise, returns the view with validation errors.</returns>
+        /// <param name="nonCongregantId">The ID of the non-congregant to return to after editing.</param>
+        /// <returns>A redirect to the donation history if the update is successful; otherwise, returns the view with validation errors.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditDonation(int id, Donation donation, int? congregantId)
+        public async Task<IActionResult> EditDonation(int id, Donation donation, int? congregantId, int? nonCongregantId)
         {
             if (id != donation.ID)
             {
@@ -527,10 +550,14 @@ namespace DonorTrackingSystem.Controllers
 
                     TempData["SuccessMessage"] = $"Donation updated successfully!";
 
-                    // Return to the congregant's donation history if congregantId is provided
+                    // Return to the appropriate donation history
                     if (congregantId.HasValue)
                     {
                         return RedirectToAction(nameof(CongregantDonationHistory), new { id = congregantId });
+                    }
+                    else if (nonCongregantId.HasValue)
+                    {
+                        return RedirectToAction(nameof(NonCongregantDonationHistory), new { id = nonCongregantId });
                     }
 
                     return RedirectToAction(nameof(Index));
@@ -557,6 +584,7 @@ namespace DonorTrackingSystem.Controllers
             );
 
             ViewBag.CongregantID = congregantId;
+            ViewBag.NonCongregantID = nonCongregantId;
 
             return View(donation);
         }

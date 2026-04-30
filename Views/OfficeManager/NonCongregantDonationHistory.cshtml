@@ -16,6 +16,15 @@
         </div>
     </div>
 
+    <!-- Success message notification -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Summary statistics -->
     @if (Model != null && Model.Any())
     {
@@ -85,6 +94,7 @@
                                         <th>Amount</th>
                                         <th>Fund Designation</th>
                                         <th>Envelope #</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,6 +111,12 @@
                                                 </span>
                                             </td>
                                             <td>@(donation.EnvelopeNumber ?? "N/A")</td>
+                                            <td class="text-center">
+                                                <a asp-action="EditDonation" asp-route-id="@donation.ID" asp-route-nonCongregantId="@nonCongregantID" 
+                                                   class="btn btn-sm btn-warning">
+                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                </a>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -108,7 +124,7 @@
                                     <tr>
                                         <th class="text-end">Total:</th>
                                         <th class="text-success">@totalDonations.ToString("C")</th>
-                                        <th colspan="2"></th>
+                                        <th colspan="3"></th>
                                     </tr>
                                 </tfoot>
                             </table>

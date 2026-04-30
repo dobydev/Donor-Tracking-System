@@ -2,7 +2,9 @@
 @{
     ViewData["Title"] = "Edit Donation";
     var congregantId = ViewBag.CongregantID as int?;
-    var congregantName = ViewBag.CongregantName as string;
+    var nonCongregantId = ViewBag.NonCongregantID as int?;
+    var donorName = ViewBag.DonorName as string;
+    var isCongregant = ViewBag.IsCongregant as bool? ?? true;
 }
 
 <div class="container mt-4">
@@ -17,7 +19,7 @@
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i> 
-                        <strong>Editing donation for:</strong> @congregantName
+                        <strong>Editing donation for:</strong> @donorName
                     </div>
 
                     <form asp-action="EditDonation" method="post">
@@ -26,6 +28,7 @@
                         <input type="hidden" asp-for="CongregantID" />
                         <input type="hidden" asp-for="NonCongregantID" />
                         <input type="hidden" name="congregantId" value="@congregantId" />
+                        <input type="hidden" name="nonCongregantId" value="@nonCongregantId" />
 
                         <!-- Validation Summary -->
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -73,9 +76,24 @@
 
                         <!-- Action buttons -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a asp-action="CongregantDonationHistory" asp-route-id="@congregantId" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
+                            @if (isCongregant && congregantId.HasValue)
+                            {
+                                <a asp-action="CongregantDonationHistory" asp-route-id="@congregantId" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            }
+                            else if (!isCongregant && nonCongregantId.HasValue)
+                            {
+                                <a asp-action="NonCongregantDonationHistory" asp-route-id="@nonCongregantId" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            }
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-save"></i> Save Changes
                             </button>

@@ -197,13 +197,13 @@ namespace DonorTrackingSystem.Data
             // Seed default users for each role
 
             // Administrator: ID 1000, Password 123456
-            await CreateUserIfNotExists(userManager, "1000", "123456", "Administrator");
+            await CreateUserIfNotExists(userManager, "1000", "171717", "Administrator");
 
             // Office Manager: ID 2000, Password 654321
-            await CreateUserIfNotExists(userManager, "2000", "654321", "Office Manager");
+            await CreateUserIfNotExists(userManager, "2000", "161616", "Office Manager");
 
             // Support Staff: ID 3000, Password 111111
-            await CreateUserIfNotExists(userManager, "3000", "111111", "Support Staff");
+            await CreateUserIfNotExists(userManager, "3000", "151515", "Support Staff");
         }
 
         // Helper method to create a user if it does not exist
